@@ -13,14 +13,14 @@ fi
 # Default location
 CONFIGSOURCE="/config/gazpar_2_mqtt/config.yaml"
 echo "Config source: $CONFIGSOURCE"
+mkdir -p -v /config/gazpar_2_mqtt
 
 # Migrate if needed
-echo "before migrate"
-if ! bashio::fs.directory_exists '/config/gazpar_2_mqtt/' \
-    && bashio::fs.file_exists '/homeassistant/gazpar_2_mqtt/config.yaml'; then
-    bashio::log.info "Mirgrating data from Home Assistant to add-on config folder"
-    mkdir -p /config/grott || bashio::exit.nok "Failed to create Grott configuration folder"
-    cp -rf /homeassistant/gazpar_2_mqtt/* /config/gazpar_2_mqtt/ || bashio::exit.nok "Failed to migrate Grott configuration"
+echo "before migrate 2"
+if [ -f /config/gazpar_2_mqtt/] \
+    && [ -f /homeassistant/gazpar_2_mqtt/config.yaml ]; then
+    echo "Migrating data from Home Assistant to add-on config folder"
+    cp -rf /homeassistant/gazpar_2_mqtt/* /config/gazpar_2_mqtt/ 
 fi
 
 ####################
