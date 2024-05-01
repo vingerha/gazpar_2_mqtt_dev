@@ -3,6 +3,7 @@ description: "Extracts GRDF data into MQTT a.o."
 version: "0.3.0"
 slug: "hello_world"
 init: false
+homeassistant_api: true
 arch:
   - aarch64
   - amd64
@@ -13,11 +14,12 @@ map:
   - addon_config:rw
   - homeassistant_config:rw  
 options:
-  log_level: info
   verbose: true
+  data_path: /config/gazpar_2_mqtt
 schema:
   GRDF_USERNAME: str
   GRDF_PASSWORD: str
   MQTT_HOST: str
   verbose: bool?
   mqttHost: str
+  log_level: list(trace|debug|info|notice|warning|error|fatal)?
