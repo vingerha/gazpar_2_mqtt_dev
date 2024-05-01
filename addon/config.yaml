@@ -16,10 +16,12 @@ map:
 options:
   verbose: true
   data_path: /config/gazpar_2_mqtt
+  CONFIG_LOCATION: /config/gazpar_2_mqtt/config.yaml
 schema:
   GRDF_USERNAME: str
   GRDF_PASSWORD: str
   MQTT_HOST: str
   verbose: bool?
   mqttHost: str
+  CONFIG_LOCATION: str
   log_level: list(trace|debug|info|notice|warning|error|fatal)?
