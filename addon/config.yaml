@@ -1,7 +1,7 @@
 name: "Gazpar 2 MQTT"
 description: "Extracts data from GRDF to MQTT"
 version: "0.3.0"
-slug: "gazpar_2_mqtt"
+slug: "gazpar2mqtt"
 init: false
 arch:
   - arm64
