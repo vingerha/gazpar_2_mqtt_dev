@@ -1,5 +1,7 @@
 #!/bin/sh
 set -e
+
+echo "Getting parameters"
 exec /usr/local/bin/config_yaml.sh
 
 if [ ! -z "$GAZPAR_2_MQTT_APP" ]; then

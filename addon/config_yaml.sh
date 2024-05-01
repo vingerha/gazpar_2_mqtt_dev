@@ -50,8 +50,10 @@ while IFS= read -r line; do
 		echo "Line2 / secret: $line"
     fi
     # Data validation
+	echo "Line3: $line"
     if [[ "$line" =~ ^.+[=].+$ ]]; then
         # extract keys and values
+		echo "Line4: $line"
         KEYS="${line%%=*}"
         VALUE="${line#*=}"
         line="${KEYS}='${VALUE}'"
@@ -63,19 +65,22 @@ while IFS= read -r line; do
             echo "os.environ['${KEYS}'] = '${VALUE//[\"\']/}'" >> /env.py
             python3 /env.py
         fi
+		echo "Line for env: $line"
         # set .env
         if [ -f /.env ]; then echo "$line" >> /.env; fi
         mkdir -p /etc
         echo "$line" >> /etc/environment
         # Export to scripts
+		echo "Line export to scripts: $line"
         if cat /etc/services.d/*/*run* &>/dev/null; then sed -i "1a export $line" /etc/services.d/*/*run* 2>/dev/null; fi
         if cat /etc/cont-init.d/*run* &>/dev/null; then sed -i "1a export $line" /etc/cont-init.d/*run* 2>/dev/null; fi
         # For s6
         if [ -d /var/run/s6/container_environment ]; then printf "%s" "${VALUE}" > /var/run/s6/container_environment/"${KEYS}"; fi
         echo "export $line" >> ~/.bashrc
         # Show in log
-        echo "$line"
+        echo "Last line: $line"
     else
         echo "$line does not follow the correct structure. Please check your yaml file."
     fi
 done <"$CONFIGSOURCE"
+echo "End of getting parameters"
