@@ -4,8 +4,8 @@ FROM vingerha/gazpar_2_mqtt
 #  Install apps  #
 ##################
 
-COPY ../app /app
-COPY ../app /app_temp
+COPY ./app /app
+COPY ./app /app_temp
 
 ################
 # 4 Entrypoint #
