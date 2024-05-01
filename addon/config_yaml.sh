@@ -16,7 +16,7 @@ fi
 
 # Define slug
 slug="${HOSTNAME}"
-
+echo "Slug: $slug"
 # Check type of config folder
 if [ ! -f /config/configuration.yaml ] && [ ! -f /config/configuration.json ]; then
     # New config location
