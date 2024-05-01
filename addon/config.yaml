@@ -9,3 +9,9 @@ arch:
   - armhf
   - armv7
   - i386
+options:
+  log_level: info
+schema:
+  GRDF_USERNAME: str
+  GRDF_PASSWORD: str
+  MQTT_HOST: str
