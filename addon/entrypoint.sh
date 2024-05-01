@@ -1,5 +1,6 @@
 #!/bin/sh
 set -e
+exec /usr/local/bin/config_yaml.sh
 
 if [ ! -z "$GAZPAR_2_MQTT_APP" ]; then
     APP="$GAZPAR_2_MQTT_APP"
@@ -23,7 +24,5 @@ if [ ! -f "$APP/param.py" ]; then
     echo "param.py non existing, copying default to /app..."
     cp /app_temp/param.py "$APP/param.py"
 fi
-
-exec /usr/local/bin/config_yaml.sh
 
 exec "$@"
