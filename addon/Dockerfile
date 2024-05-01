@@ -1,5 +1,12 @@
 FROM vingerha/gazpar_2_mqtt
 
+##################
+#  Install apps  #
+##################
+
+# Add rootfs
+COPY rootfs/ /
+
 COPY ./app /app
 COPY ./app /app_temp
 
@@ -20,7 +27,7 @@ CMD ["python3", "app/gazpar2mqtt.py"]
 ############
 
 LABEL \
-  io.hass.version="0.3.0" \
+  io.hass.version="0.2.0" \
   io.hass.type="addon" \
   io.hass.arch="armv7|amd64|arm64"
 
