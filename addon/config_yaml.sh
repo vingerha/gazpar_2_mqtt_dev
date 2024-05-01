@@ -15,24 +15,13 @@ if [ ! -d /config ]; then
 fi
 
 # Default location
-mkdir -p "/config/gazpar_2_mqtt" || true
+mkdir -p /config/gazpar_2_mqtt || true
 CONFIGSOURCE="/config/gazpar_2_mqtt/config.yaml"
 echo "Config source: $CONFIGSOURCE"
 
 ####################
 # LOAD CONFIG.YAML #
 ####################
-
-echo ""
-echo "Load environment variables from $CONFIGSOURCE if existing"
-if [[ "$CONFIGSOURCE" == "/config"* ]]; then
-    echo "If accessing the file with filebrowser it should be mapped to $CONFIGFILEBROWSER"
-else
-    echo "If accessing the file with filebrowser it should be mapped to $CONFIGSOURCE"
-fi
-echo "---------------------------------------------------------"
-echo "Wiki here on how to use : github.com/vingerha/gazpar_2_mqtt"
-echo ""
 
 # Check if config file is there, or create one from template
 if [ ! -f "$CONFIGSOURCE" ]; then
