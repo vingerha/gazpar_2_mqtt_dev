@@ -15,6 +15,7 @@ CONFIGSOURCE="/config/gazpar_2_mqtt/config.yaml"
 echo "Config source: $CONFIGSOURCE"
 
 # Migrate if needed
+echo "before migrate"
 if ! bashio::fs.directory_exists '/config/gazpar_2_mqtt/' \
     && bashio::fs.file_exists '/homeassistant/gazpar_2_mqtt/config.yaml'; then
     bashio::log.info "Mirgrating data from Home Assistant to add-on config folder"
