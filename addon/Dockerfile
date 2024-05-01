@@ -17,6 +17,9 @@ RUN if [ ! -f /bin/sh ] && [ -f /usr/bin/sh ]; then ln -s /usr/bin/sh /bin/sh; f
 # 4 Entrypoint #
 ################
 
+CONFIG_PATH=/data/options.json
+TARGET="$(bashio::config 'target')"
+
 COPY entrypoint.sh /usr/local/bin/
 COPY config_yaml.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/config_yaml.sh
