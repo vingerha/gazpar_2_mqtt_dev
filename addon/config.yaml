@@ -1,6 +1,6 @@
-name: "Hello world"
-description: "My first real add-on!"
-version: "1.0.0"
+name: "Gazpar 2 MQTT"
+description: "Extracts data from GRDF to MQTT"
+version: "0.3.0"
 slug: "hello_world"
 init: false
 arch:
@@ -8,4 +8,3 @@ arch:
   - amd64
   - armhf
   - armv7
-  - i386
