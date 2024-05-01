@@ -1,0 +1,2 @@
+build_from:
+  arm64: vingerha/gazpar_2_mqtt
