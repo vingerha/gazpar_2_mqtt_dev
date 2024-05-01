@@ -1,9 +1,11 @@
 name: "Gazpar 2 MQTT"
-description: "Extracts data from GRDF to MQTT"
-version: "0.3.0"
-slug: "gazpar2mqtt"
+description: "My first real add-on!"
+version: "1.0.0"
+slug: "hello_world"
 init: false
 arch:
-  - arm64
+  - aarch64
   - amd64
+  - armhf
   - armv7
+  - i386
