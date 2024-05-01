@@ -1,5 +1,7 @@
 # Pinched a bit from Alexbelgium (thanks)
-#!/bin/bash
+#!/usr/bin/with-contenv bashio
+# shellcheck shell=bash
+# shellcheck disable=SC2155,SC1087,SC2163,SC2116,SC2086
 set -e
 
 # Exit if /config is not mounted
@@ -25,6 +27,7 @@ fi
 
 while IFS= read -r line; do
     # Clean output
+	echo "Line0: $line"
     line="${line//[\"\']/}"
 	echo "Line1: $line"
     # Check if secret
