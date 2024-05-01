@@ -1,9 +1,9 @@
 ---
 name: Gazpar_2_Mqtt
 version: dev
-slug: gazpar_2_mqtt
+slug: gazpar_2_mqtt_dev
 description: Gazpar_2_Mqtt add-on for Home Assistant
-url: https://github.com/vingerha/gazpar_2_mqtt
+url: https://github.com/vingerha/gazpar_2_mqtt_dev
 homeassistant_api: true
 map:
   - addon_config:rw
