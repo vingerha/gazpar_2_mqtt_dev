@@ -1,4 +1,7 @@
-#!/bin/sh
+# Pinched a bit from Alexbelgium (thanks)
+#!/usr/bin/with-contenv bashio
+# shellcheck shell=bash
+# shellcheck disable=SC2155,SC1087,SC2163,SC2116,SC2086
 set -e
 
 ####################
@@ -107,4 +110,4 @@ if [ ! -f "$APP/param.py" ]; then
     cp /app_temp/param.py "$APP/param.py"
 fi
 
-exec "$@"
+exec "python3 app/gazpar2mqtt.py"
