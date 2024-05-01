@@ -5,20 +5,15 @@ slug: "gazpar_2_mqtt"
 init: false
 homeassistant_api: true
 arch:
-  - aarch64
   - amd64
-  - armhf
+  - arm64
   - armv7
-  - i386
 map:
   - addon_config:rw
   - homeassistant_config:rw  
 options:
   verbose: true
-  data_path: /config/gazpar_2_mqtt
   CONFIG_LOCATION: /config/gazpar_2_mqtt/config.yaml
 schema:
   verbose: bool?
-  mqttHost: str
-  CONFIG_LOCATION: str
   log_level: list(trace|debug|info|notice|warning|error|fatal)?
