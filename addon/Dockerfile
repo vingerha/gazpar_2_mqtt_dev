@@ -7,6 +7,10 @@ FROM vingerha/gazpar_2_mqtt
 COPY ./app /app
 COPY ./app /app_temp
 COPY rootfs/ /
+
+# Uses /bin for compatibility purposes
+RUN if [ ! -f /bin/sh ] && [ -f /usr/bin/sh ]; then ln -s /usr/bin/sh /bin/sh; fi && \
+    if [ ! -f /bin/bash ] && [ -f /usr/bin/bash ]; then ln -s /usr/bin/bash /bin/bash; fi
 ################
 # 4 Entrypoint #
 ################
