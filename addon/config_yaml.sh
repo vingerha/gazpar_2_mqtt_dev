@@ -14,24 +14,9 @@ if [ ! -d /config ]; then
     exit 0
 fi
 
-# Define slug
-slug="${HOSTNAME}"
-echo "Slug: $slug"
-# Check type of config folder
-if [ ! -f /config/configuration.yaml ] && [ ! -f /config/configuration.json ]; then
-    # New config location
-    CONFIGLOCATION="/config"
-    CONFIGFILEBROWSER="/addon_configs/$slug/config.yaml"
-else
-    # Legacy config location
-    slug="${HOSTNAME#*-}"
-    CONFIGLOCATION="/config/addons_config/${slug}"
-    CONFIGFILEBROWSER="/homeassistant/addons_config/$slug/config.yaml"
-fi
-
 # Default location
-mkdir -p "$CONFIGLOCATION" || true
-CONFIGSOURCE="$CONFIGLOCATION"/config.yaml
+mkdir -p /config/gazpar_2_mqtt || true
+CONFIGSOURCE=/config/gazpar_2_mqtt/config.yaml
 echo "Config source: $CONFIGSOURCE"
 
 if [[ "$CONFIGSOURCE" != *".yaml" ]]; then
