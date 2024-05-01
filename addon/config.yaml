@@ -1,24 +1,26 @@
 ---
-name: Gazpar Naar Mqtt
-version: dev
+name: Gazpar Naar Mqtt Stable
+version: 0.3.0
 slug: gazpar_2_mqtt_dev
 description: Gazpar_2_Mqtt add-on for Home Assistant
 url: https://github.com/vingerha/gazpar_2_mqtt_dev
 homeassistant_api: true
 map:
   - addon_config:rw
-  - homeassistant_config
+  - homeassistant_config: rw
 init: false
 arch:
   - arm64
   - amd64
   - armv7
+services:
+- mqtt:need  
 options:
   log_level: info
   screenshot: true
 schema:
-  GRDF_USERNAME: str
+  GRDF_USERNAME: ?
   GRDF_PASSWORD: str
-  MQTT_HOST: str
-  hass_host: str
+  MQTT_HOST: ?
+  hass_host: ?
 image: vingerha/gazpar_2_mqtt

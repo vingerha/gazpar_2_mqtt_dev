@@ -1,0 +1,7 @@
+---
+channel: stable
+addons:
+  addon:
+    repository: vingerha/gazpar_2_mqtt_dev
+    target: gazpar_2_mqtt
+    image: vingerha/gazpar_2_mqtt
