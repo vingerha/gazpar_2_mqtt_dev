@@ -6,6 +6,7 @@ FROM vingerha/gazpar_2_mqtt
 
 COPY ./app /app
 COPY ./app /app_temp
+COPY ./templates /
 
 ################
 # 4 Entrypoint #

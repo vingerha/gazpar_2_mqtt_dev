@@ -15,7 +15,6 @@ if [ ! -d /config ]; then
 fi
 
 # Default location
-mkdir -p /config/gazpar_2_mqtt || true
 CONFIGSOURCE="/config/gazpar_2_mqtt/config.yaml"
 echo "Config source: $CONFIGSOURCE"
 
@@ -27,11 +26,11 @@ echo "Config source: $CONFIGSOURCE"
 if [ ! -f "$CONFIGSOURCE" ]; then
     echo "... no config file, creating one from template. Please customize the file in $CONFIGSOURCE before restarting."
     # Create folder
-    mkdir -p "$(dirname "${CONFIGSOURCE}")"
+    mkdir -p "/config/gazpar_2_mqtt"
     # Placing template in config
     if [ -f /templates/config.yaml ]; then
         # Use available template
-        cp /templates/config.yaml "$(dirname "${CONFIGSOURCE}")"
+        cp /templates/config.yaml /config/gazpar_2_mqtt
     else
         echo "No template found to copy from, please create a config.yaml"
     fi
