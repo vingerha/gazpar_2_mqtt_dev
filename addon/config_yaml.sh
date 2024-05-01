@@ -3,6 +3,9 @@
 # shellcheck shell=bash
 # shellcheck disable=SC2155,SC1087,SC2163,SC2116,SC2086
 set -e
+####################
+# LOAD CONFIG.YAML #
+####################
 
 # Exit if /config is not mounted
 if [ ! -d /config ]; then
@@ -18,11 +21,6 @@ mkdir -p -v /config/gazpar_2_mqtt
 # Migrate if needed
 echo "before migrate 2"
 cp -rf /homeassistant/gazpar_2_mqtt/* /config/gazpar_2_mqtt/ 
-
-
-####################
-# LOAD CONFIG.YAML #
-####################
 
 # Check if config file is there, or create one from template
 if [ ! -f "$CONFIGSOURCE" ]; then
@@ -83,4 +81,7 @@ while IFS= read -r line; do
         echo "$line does not follow the correct structure. Please check your yaml file."
     fi
 done <"$CONFIGSOURCE"
-echo "End of getting parameters"
+echo "End of config_yaml.sh"
+########################
+# END LOAD CONFIG.YAML #
+########################
