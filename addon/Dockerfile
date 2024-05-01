@@ -4,9 +4,6 @@ FROM vingerha/gazpar_2_mqtt
 #  Install apps  #
 ##################
 
-# Add rootfs
-COPY rootfs/ /
-
 COPY ./app /app
 COPY ./app /app_temp
 
