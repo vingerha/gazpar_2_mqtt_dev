@@ -26,7 +26,7 @@ echo "Config source: $CONFIGSOURCE"
 if [ ! -f "$CONFIGSOURCE" ]; then
     echo "... no config file, creating one from template. Please customize the file in $CONFIGSOURCE before restarting."
     # Create folder
-    mkdir -p "/config/gazpar_2_mqtt"
+    mkdir -p /config/gazpar_2_mqtt
     # Placing template in config
     if [ -f /templates/config.yaml ]; then
         # Use available template
@@ -47,14 +47,6 @@ if [ ! -s /tempenv ]; then
     exit 0
 fi
 rm /tempenv
-
-# Check if yaml is valid
-EXIT_CODE=0
-yamllint -d relaxed "$CONFIGSOURCE" &>ERROR || EXIT_CODE=$?
-if [ "$EXIT_CODE" != 0 ]; then
-    cat ERROR
-    echo "... config file has an invalid yaml format. Please check the file in $CONFIGSOURCE. Errors list above."
-fi
 
 # Export all yaml entries as env variables
 # Helper function
