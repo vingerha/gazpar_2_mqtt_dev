@@ -1,6 +1,6 @@
 name: "Gazpar 2 MQTT"
 description: "Extracts GRDF data into MQTT a.o."
-version: "1.0.0"
+version: "0.3.0"
 slug: "hello_world"
 init: false
 arch:
@@ -9,9 +9,14 @@ arch:
   - armhf
   - armv7
   - i386
+map:
+  - addon_config:rw
+  - homeassistant_config:rw  
 options:
   log_level: info
+  verbose: true
 schema:
   GRDF_USERNAME: str
   GRDF_PASSWORD: str
   MQTT_HOST: str
+  verbose: bool
