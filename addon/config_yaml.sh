@@ -17,7 +17,7 @@ mkdir -p -v /config/gazpar_2_mqtt
 
 # Migrate if needed
 echo "before migrate 2"
-if [ -f /config/gazpar_2_mqtt/] \
+if [ -f /config/gazpar_2_mqtt ] \
     && [ -f /homeassistant/gazpar_2_mqtt/config.yaml ]; then
     echo "Migrating data from Home Assistant to add-on config folder"
     cp -rf /homeassistant/gazpar_2_mqtt/* /config/gazpar_2_mqtt/ 
