@@ -24,14 +24,14 @@ echo "Config source: $CONFIGSOURCE"
 ####################
 
 echo ""
-bashio::log.green "Load environment variables from $CONFIGSOURCE if existing"
+echo "Load environment variables from $CONFIGSOURCE if existing"
 if [[ "$CONFIGSOURCE" == "/config"* ]]; then
-    bashio::log.green "If accessing the file with filebrowser it should be mapped to $CONFIGFILEBROWSER"
+    echo "If accessing the file with filebrowser it should be mapped to $CONFIGFILEBROWSER"
 else
-    bashio::log.green "If accessing the file with filebrowser it should be mapped to $CONFIGSOURCE"
+    echo "If accessing the file with filebrowser it should be mapped to $CONFIGSOURCE"
 fi
-bashio::log.green "---------------------------------------------------------"
-bashio::log.green "Wiki here on how to use : github.com/vingerha/gazpar_2_mqtt"
+echo "---------------------------------------------------------"
+echo "Wiki here on how to use : github.com/vingerha/gazpar_2_mqtt"
 echo ""
 
 # Check if config file is there, or create one from template
@@ -55,7 +55,7 @@ sed -i '/^ /d' /tempenv
 sed -i '/^$/d' /tempenv
 # Exit if empty
 if [ ! -s /tempenv ]; then
-    bashio::log.green "... no env variables found, exiting"
+    echo "... no env variables found, exiting"
     exit 0
 fi
 rm /tempenv
@@ -65,7 +65,7 @@ EXIT_CODE=0
 yamllint -d relaxed "$CONFIGSOURCE" &>ERROR || EXIT_CODE=$?
 if [ "$EXIT_CODE" != 0 ]; then
     cat ERROR
-    bashio::log.yellow "... config file has an invalid yaml format. Please check the file in $CONFIGSOURCE. Errors list above."
+    echo "... config file has an invalid yaml format. Please check the file in $CONFIGSOURCE. Errors list above."
 fi
 
 # Export all yaml entries as env variables
@@ -135,6 +135,6 @@ while IFS= read -r line; do
         # Show in log
         if ! bashio::config.false "verbose"; then bashio::log.blue "$line"; fi
     else
-        bashio::log.red "$line does not follow the correct structure. Please check your yaml file."
+        echo "$line does not follow the correct structure. Please check your yaml file."
     fi
 done <"/tmpfile"
