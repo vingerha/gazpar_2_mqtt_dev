@@ -15,20 +15,9 @@ if [ ! -d /config ]; then
 fi
 
 # Default location
-mkdir -p /config/gazpar_2_mqtt || true
-CONFIGSOURCE=/config/gazpar_2_mqtt/config.yaml
+mkdir -p "/config/gazpar_2_mqtt" || true
+CONFIGSOURCE="/config/gazpar_2_mqtt/config.yaml"
 echo "Config source: $CONFIGSOURCE"
-
-if [[ "$CONFIGSOURCE" != *".yaml" ]]; then
-    bashio::log.error "Something is going wrong in the config location, quitting"
-fi
-
-# Permissions
-if [[ "$CONFIGSOURCE" == *".yaml" ]]; then
-    echo "Setting permissions for the config.yaml directory"
-    mkdir -p "$(dirname "${CONFIGSOURCE}")"
-    chmod -R 755 "$(dirname "${CONFIGSOURCE}")" 2>/dev/null
-fi
 
 ####################
 # LOAD CONFIG.YAML #
