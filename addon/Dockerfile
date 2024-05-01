@@ -12,7 +12,7 @@ COPY ./app /app_temp
 ################
 
 COPY entrypoint.sh /usr/local/bin/
-RUN chmod 744 ./config_yaml.sh
+RUN chmod 744 config_yaml.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
 ENTRYPOINT ["entrypoint.sh"]
 CMD ["entrypoint.sh"]
