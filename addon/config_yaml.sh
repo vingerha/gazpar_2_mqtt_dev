@@ -10,6 +10,7 @@ set -e
 
 # Exit if /config is not mounted
 if [ ! -d /config ]; then
+	echo "Error: /config not mounted"
     exit 0
 fi
 
