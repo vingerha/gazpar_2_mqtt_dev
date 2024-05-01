@@ -1,12 +1,6 @@
-# Pinched from Alexbelgium (thanks)
-#!/usr/bin/with-contenv bashio
-# shellcheck shell=bash
-# shellcheck disable=SC2155,SC1087,SC2163,SC2116,SC2086
+# Pinched a bit from Alexbelgium (thanks)
+#!/bin/bash
 set -e
-
-##################
-# INITIALIZATION #
-##################
 
 # Exit if /config is not mounted
 if [ ! -d /config ]; then
@@ -24,16 +18,7 @@ echo "Config source: $CONFIGSOURCE"
 
 # Check if config file is there, or create one from template
 if [ ! -f "$CONFIGSOURCE" ]; then
-    echo "... no config file, creating one from template. Please customize the file in $CONFIGSOURCE before restarting."
-    # Create folder
-    mkdir -p /config/gazpar_2_mqtt
-    # Placing template in config
-    if [ -f /templates/config.yaml ]; then
-        # Use available template
-        cp /templates/config.yaml /config/gazpar_2_mqtt
-    else
-        echo "No template found to copy from, please create a config.yaml"
-    fi
+    echo "... no config file found, Please create $CONFIGSOURCE "
 fi
 
 # Check if there are lines to read
@@ -113,7 +98,7 @@ while IFS= read -r line; do
         if [ -d /var/run/s6/container_environment ]; then printf "%s" "${VALUE}" > /var/run/s6/container_environment/"${KEYS}"; fi
         echo "export $line" >> ~/.bashrc
         # Show in log
-        if ! bashio::config.false "verbose"; then bashio::log.blue "$line"; fi
+        echo "$line"
     else
         echo "$line does not follow the correct structure. Please check your yaml file."
     fi
