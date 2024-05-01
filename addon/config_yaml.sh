@@ -32,41 +32,7 @@ fi
 # Default location
 mkdir -p "$CONFIGLOCATION" || true
 CONFIGSOURCE="$CONFIGLOCATION"/config.yaml
-
-# Is there a custom path
-if bashio::config.has_value 'CONFIG_LOCATION'; then
-
-    CONFIGSOURCE=$(bashio::config "CONFIG_LOCATION")
-    # If does not end by config.yaml, remove trailing slash and add config.yaml
-    if [[ "$CONFIGSOURCE" != *".yaml" ]]; then
-        CONFIGSOURCE="${CONFIGSOURCE%/}"/config.yaml
-    fi
-    # Check if config is located in an acceptable location
-    LOCATIONOK=""
-    for location in "/share" "/config" "/data"; do
-        if [[ "$CONFIGSOURCE" == "$location"* ]]; then
-            LOCATIONOK=true
-        fi
-    done
-    if [ -z "$LOCATIONOK" ]; then
-        bashio::log.red "Watch-out : your CONFIG_LOCATION values can only be set in /share, /config or /data (internal to addon). It will be reset to the default location : $CONFIGLOCATION/config.yaml"
-        CONFIGSOURCE="$CONFIGLOCATION"/config.yaml
-    fi
-fi
-
-# Migrate if needed
-if [[ "$CONFIGLOCATION" == "/config" ]]; then
-    # Migrate file
-    if [ -f "/homeassistant/addons_config/${slug}/config.yaml" ]; then
-        echo "Migrating config.yaml to new config location"
-        mv /homeassistant/addons_config/"${slug}"/config.yaml /config/config.yaml
-    fi
-    # Migrate option
-    if [[ "$(bashio::config "CONFIG_LOCATION")" == "/config/addons_config"* ]] && [ -f /config/config.yaml ]; then
-        bashio::addon.option "CONFIG_LOCATION" "/config/config.yaml"
-        CONFIGSOURCE="/config/config.yaml"
-    fi
-fi
+echo "Config source: $CONFIGSOURCE"
 
 if [[ "$CONFIGSOURCE" != *".yaml" ]]; then
     bashio::log.error "Something is going wrong in the config location, quitting"
@@ -91,7 +57,7 @@ else
     bashio::log.green "If accessing the file with filebrowser it should be mapped to $CONFIGSOURCE"
 fi
 bashio::log.green "---------------------------------------------------------"
-bashio::log.green "Wiki here on how to use : github.com/alexbelgium/hassio-addons/wiki/Add‐ons-feature-:-add-env-variables"
+bashio::log.green "Wiki here on how to use : github.com/vingerha/gazpar_2_mqtt"
 echo ""
 
 # Check if config file is there, or create one from template
@@ -104,9 +70,7 @@ if [ ! -f "$CONFIGSOURCE" ]; then
         # Use available template
         cp /templates/config.yaml "$(dirname "${CONFIGSOURCE}")"
     else
-        # Download template
-        TEMPLATESOURCE="https://raw.githubusercontent.com/alexbelgium/hassio-addons/master/.templates/config.template"
-        curl -f -L -s -S "$TEMPLATESOURCE" --output "$CONFIGSOURCE"
+        echo "No template found to copy from, please create a config.yaml"
     fi
 fi
 
