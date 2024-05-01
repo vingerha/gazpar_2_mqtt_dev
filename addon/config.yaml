@@ -1,5 +1,5 @@
 name: "Gazpar 2 MQTT"
-description: "My first real add-on!"
+description: "Extracts GRDF data into MQTT a.o."
 version: "1.0.0"
 slug: "hello_world"
 init: false
