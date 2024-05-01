@@ -19,4 +19,5 @@ schema:
   GRDF_USERNAME: str
   GRDF_PASSWORD: str
   MQTT_HOST: str
-  verbose: bool
+  verbose: bool?
+  mqttHost: str
