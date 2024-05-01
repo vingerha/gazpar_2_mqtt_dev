@@ -21,47 +21,12 @@ if [ ! -f "$CONFIGSOURCE" ]; then
     echo "... no config file found, Please create $CONFIGSOURCE "
 fi
 
-# Check if there are lines to read
-cp "$CONFIGSOURCE" /tempenv
-sed -i '/^#/d' /tempenv
-sed -i '/^ /d' /tempenv
-sed -i '/^$/d' /tempenv
-# Exit if empty
-if [ ! -s /tempenv ]; then
-    echo "... no env variables found, exiting"
-    exit 0
-fi
-rm /tempenv
-
 # Export all yaml entries as env variables
-# Helper function
-function parse_yaml {
-    local prefix=$2 || local prefix=""
-    local s='[[:space:]]*' w='[a-zA-Z0-9_]*' fs=$(echo @ | tr @ '\034')
-    sed -ne "s|^\($s\):|\1|" \
-        -e "s| #.*$||g" \
-        -e "s|#.*$||g" \
-        -e "s|^\($s\)\($w\)$s:$s[\"']\(.*\)[\"']$s\$|\1$fs\2$fs\3|p" \
-        -e "s|^\($s\)\($w\)$s:$s\(.*\)$s\$|\1$fs\2$fs\3|p" $1 |
-    awk -F$fs '{
-      indent = length($1)/2;
-      vname[indent] = $2;
-      for (i in vname) {if (i > indent) {delete vname[i]}}
-      if (length($3) > 0) {
-         vn=""; for (i=0; i<indent; i++) {vn=(vn)(vname[i])("_")}
-         printf("%s%s%s=\"%s\"\n", "'$prefix'",vn, $2, $3);
-      }
-    }'
-}
-
-# Get list of parameters in a file
-parse_yaml "$CONFIGSOURCE" "" >/tmpfile
-# Escape dollars
-sed -i 's|$.|\$|g' /tmpfile
 
 while IFS= read -r line; do
     # Clean output
     line="${line//[\"\']/}"
+	echo "Line1: $line"
     # Check if secret
     if [[ "${line}" == *'!secret '* ]]; then
         echo "secret detected"
@@ -73,6 +38,7 @@ while IFS= read -r line; do
         secret=$(sed -n "/$secret:/p" /config/secrets.yaml)
         secret=${secret#*: }
         line="${line%%=*}='$secret'"
+		echo "Line2 / secret: $line"
     fi
     # Data validation
     if [[ "$line" =~ ^.+[=].+$ ]]; then
@@ -80,6 +46,7 @@ while IFS= read -r line; do
         KEYS="${line%%=*}"
         VALUE="${line#*=}"
         line="${KEYS}='${VALUE}'"
+		echo "Line for export: $line"
         export "$line"
         # export to python
         if command -v "python3" &>/dev/null; then
@@ -102,4 +69,4 @@ while IFS= read -r line; do
     else
         echo "$line does not follow the correct structure. Please check your yaml file."
     fi
-done <"/tmpfile"
+done <"$CONFIGSOURCE"
