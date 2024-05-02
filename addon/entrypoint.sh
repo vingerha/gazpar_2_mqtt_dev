@@ -49,7 +49,7 @@ while IFS= read -r line; do
         # extract keys and values
         KEYS="${line%%=*}"
         VALUE="${line#*=}"
-        line="${KEYS}='${VALUE}'"
+        line='${KEYS}="${VALUE}"'
         export "$line"
         # export to python
         if command -v "python3" &>/dev/null; then
