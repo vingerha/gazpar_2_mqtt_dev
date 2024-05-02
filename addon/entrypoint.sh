@@ -114,11 +114,8 @@ fi
 ####################
 
 
-if [ ! -z "$GAZPAR_2_MQTT_APP" ]; then
-    APP="$GAZPAR_2_MQTT_APP"
-else
-    APP="/app"
-fi
+APP="/app"
+
 
 echo "Using '$APP' as APP directory"
 
