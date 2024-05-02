@@ -25,9 +25,10 @@ COPY config_yaml.sh /app/config_yaml.sh
 RUN chmod a+x /app/config_yaml.sh
 
 RUN chmod +x /usr/local/bin/entrypoint.sh
+CMD ["./config_yaml.sh"]
 ENTRYPOINT ["entrypoint.sh"]
 CMD ["entrypoint.sh"]
-CMD ["./config_yaml.sh"]
+
 CMD ["python3", "app/gazpar2mqtt.py"]
 
 ############
