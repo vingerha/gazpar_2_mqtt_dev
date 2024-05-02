@@ -22,8 +22,8 @@ ENV LC_ALL en_US.UTF-8
 ENV TZ=Europe/Paris
 
 # Install python requirements
-RUN pip3 install --upgrade pip && \
-    pip3 install --no-cache-dir -r /app/requirement.txt
+RUN pip install --upgrade pip && \
+    pip install --no-cache-dir -r /app/requirement.txt
 
 COPY entrypoint.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/entrypoint.sh
