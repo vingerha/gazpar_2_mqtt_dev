@@ -143,8 +143,8 @@ class Params:
   # Load params from Os environment variables 
   def getFromOs(self):
     
-    if "GRDF_USERNAME" in os.environ: self.grdfUsername = os.environ["GRDF_USERNAME"]
-    if "GRDF_PASSWORD" in os.environ: self.grdfPassword = os.environ["GRDF_PASSWORD"]
+    if "GRDF_USERNAME" in os.environ: self.grdfUsername = os.environ["GRDF_USERNAME"].replace("'", '"')
+    if "GRDF_PASSWORD" in os.environ: self.grdfPassword = os.environ["GRDF_PASSWORD"].replace("'", '"')
       
     if "MQTT_HOST" in os.environ: self.mqttHost = os.environ["MQTT_HOST"]
     if "MQTT_PORT" in os.environ: self.mqttPort = int(os.environ["MQTT_PORT"])
@@ -163,10 +163,10 @@ class Params:
     if "HASS_PREFIX" in os.environ: self.hassPrefix = os.environ["HASS_PREFIX"]
     if "HASS_DEVICE_NAME" in os.environ: self.hassDeviceName = os.environ["HASS_DEVICE_NAME"]
     
-    if "BROWSER_LOGS_FOLDER" in os.environ: self.logs_folder = os.environ["BROWSER_LOGS_FOLDER"]
-    if "BROWSER_DOWNLOAD_FOLDER" in os.environ: self.download_folder = os.environ["BROWSER_DOWNLOAD_FOLDER"]
-    if "BROWSER_SCREENSHOTS" in os.environ: self.screenshots = _isItTrue(os.environ["BROWSER_SCREENSHOTS"])
-    if "BROWSER_VERBOSE" in os.environ: self.verbose = _isItTrue(os.environ["BROWSER_VERBOSE"])
+    if "BROWSER_LOGS_FOLDER" in os.environ: self.logs_folder = os.environ["BROWSER_LOGS_FOLDER"].replace("'", '"')
+    if "BROWSER_DOWNLOAD_FOLDER" in os.environ: self.download_folder = os.environ["BROWSER_DOWNLOAD_FOLDER"].replace("'", '"')
+    if "BROWSER_SCREENSHOTS" in os.environ: self.screenshots = _isItTrue(os.environ["BROWSER_SCREENSHOTS"]).replace("'", '"')
+    if "BROWSER_VERBOSE" in os.environ: self.verbose = _isItTrue(os.environ["BROWSER_VERBOSE"]).replace("'", '"')
    
     if "HASS_LTS" in os.environ: self.hassLts = _isItTrue(os.environ["HASS_LTS"])
     if "HASS_LTS_TOKEN" in os.environ: self.hassToken = os.environ["HASS_LTS_TOKEN"]
