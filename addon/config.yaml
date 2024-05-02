@@ -19,7 +19,9 @@ services:
   - mqtt:need  
 options:
   verbose: true
+  mqtt_autodiscover: true
 schema:
   verbose: bool?
+  mqtt_autodiscover: bool?
   log_level: list(trace|debug|info|notice|warning|error|fatal)?
 

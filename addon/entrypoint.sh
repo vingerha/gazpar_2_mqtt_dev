@@ -47,7 +47,6 @@ while IFS= read -r line; do
         line="${line%%=*}='$secret'"
     fi
     # Data validation
-	echo "Line3: $line"
     if [[ "$line" =~ ^.+[=].+$ ]]; then
         # extract keys and values
         KEYS="${line%%=*}"
