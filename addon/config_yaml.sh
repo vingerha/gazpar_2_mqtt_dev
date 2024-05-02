@@ -1,8 +1,8 @@
-# Pinched a bit from Alexbelgium (thanks)
 #!/usr/bin/with-contenv bashio
 # shellcheck shell=bash
 # shellcheck disable=SC2155,SC1087,SC2163,SC2116,SC2086
 set -e
+echo "Load environment vars"
 ####################
 # LOAD CONFIG.YAML #
 ####################
