@@ -1,4 +1,5 @@
-#!/bin/bash
+#!/usr/bin/with-contenv bashio
+# shellcheck shell=bash
 set -e
 
 echo "Load environment vars"
@@ -74,7 +75,7 @@ while IFS= read -r line; do
         echo "$line does not follow the correct structure. Please check your yaml file."
     fi
 done <"$CONFIGSOURCE"
-echo "End of config_yaml.sh"
+echo "End of config_yaml"
 
 ########################
 # LOAD CONFIG.YAML END #
