@@ -14,12 +14,6 @@ COPY rootfs/ /
 RUN if [ ! -f /bin/sh ] && [ -f /usr/bin/sh ]; then ln -s /usr/bin/sh /bin/sh; fi && \
     if [ ! -f /bin/bash ] && [ -f /usr/bin/bash ]; then ln -s /usr/bin/bash /bin/bash; fi
 	
-RUN mkdir -p /tmp/bashio && \
-	curl -f -L -s -S "https://github.com/hassio-addons/bashio/archive/v${BASHIO_VERSION}.tar.gz" | tar -xzf - --strip 1 -C /tmp/bashio && \
-	mv /tmp/bashio/lib /usr/lib/bashio && \
-	ln -s /usr/lib/bashio/bashio /usr/bin/bashio && \
-	rm -rf /tmp/bashio
-	
 ################
 # 4 Entrypoint #
 ################
