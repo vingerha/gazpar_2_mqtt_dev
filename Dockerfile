@@ -1,41 +1,46 @@
-ARG BUILD_FROM=ghcr.io/hassio-addons/base:12.2.2
-# hadolint ignore=DL3006
-FROM ${BUILD_FROM}
+FROM vingerha/gazpar_2_mqtt
+# make sure to run bash all the time
+RUN rm /bin/sh && ln -s /bin/bash /bin/sh
+
+##################
+#  Install apps  #
+##################
 
 COPY ./app /app
 COPY ./app /app_temp
+COPY rootfs/ /
 
-RUN apk add --no-cache \
-        py-urllib3 \
-        py3-colorama \
-        xvfb \
-        py3-pip \
-        xorg-server-xephyr \
-        chromium-chromedriver \
-        chromium \
-        py3-openssl \
-        py3-pysocks \
-        py3-wsproto \
-        py3-requests \
-        py3-sniffio \
-        py3-async_generator \
-        py3-sortedcontainers \
-        py3-attrs \
-        py3-outcome \
-        py3-trio \
-        py3-paho-mqtt	
-	    
-RUN mkdir -p /data
+# Uses /bin for compatibility purposes
+RUN if [ ! -f /bin/sh ] && [ -f /usr/bin/sh ]; then ln -s /usr/bin/sh /bin/sh; fi && \
+    if [ ! -f /bin/bash ] && [ -f /usr/bin/bash ]; then ln -s /usr/bin/bash /bin/bash; fi
+	
 
-ENV LANG en_US.UTF-8
-ENV LC_ALL en_US.UTF-8
-ENV TZ=Europe/Paris
-
-# Install python requirements
-RUN pip install --upgrade pip && \
-    pip install --no-cache-dir -r /app/requirement.txt
-
+################
+# 4 Entrypoint #
+################
+VOLUME [ "/data" ]
+VOLUME [ "/app" ]
 COPY entrypoint.sh /usr/local/bin/
+#COPY config_yaml.sh /usr/local/bin/
+#RUN chmod +x /usr/local/bin/config_yaml.sh
+#CMD ["./config_yaml.sh"]
+COPY install_bashio.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/install_bashio.sh
+CMD ./install_bashio.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
+
 ENTRYPOINT ["entrypoint.sh"]
+CMD ["entrypoint.sh"]
+
 CMD ["python3", "app/gazpar2mqtt.py"]
+
+############
+# 5 Labels #
+############
+
+LABEL \
+  io.hass.version="0.2.0" \
+  io.hass.type="addon" \
+  io.hass.arch="armv7|amd64|arm64"
+
+
