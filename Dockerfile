@@ -1,4 +1,5 @@
-ARG BUILD_FROM
+ARG BUILD_FROM=ghcr.io/hassio-addons/debian-base:latest
+# hadolint ignore=DL3006
 FROM ${BUILD_FROM}
 
 COPY ./app /app
