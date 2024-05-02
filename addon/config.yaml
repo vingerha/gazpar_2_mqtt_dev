@@ -16,7 +16,7 @@ map:
   - homeassistant_config:rw  
   - all_addon_configs:rw
 services:
-  - mqtt:want  
+  - mqtt:need  
 options:
   verbose: true
 schema:
