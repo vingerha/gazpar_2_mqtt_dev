@@ -13,8 +13,9 @@ arch:
   - i386
 map:
   - addon_config:rw
+  - addon_configs:rw
   - homeassistant_config:rw  
-  - all_addon_config:rw
+  - all_addon_configs:rw
 services:
   - mqtt:need  
 options:
