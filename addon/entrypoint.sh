@@ -24,6 +24,6 @@ if [ ! -f "$APP/param.py" ]; then
     cp /app_temp/param.py "$APP/param.py"
 fi
 
-exec /usr/local/bin/config_yaml.sh
+exec ./config_yaml.sh
 
 exec "$@"
