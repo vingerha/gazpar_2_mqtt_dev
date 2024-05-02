@@ -1,6 +1,6 @@
 FROM vingerha/gazpar_2_mqtt_dev
 # make sure to run bash all the time
-RUN rm /bin/sh && ln -s /bin/bash /bin/sh
+#RUN rm /bin/sh && ln -s /bin/bash /bin/sh
 
 ##################
 #  Install apps  #
@@ -11,8 +11,8 @@ COPY ./app /app_temp
 COPY rootfs/ /
 
 # Uses /bin for compatibility purposes
-RUN if [ ! -f /bin/sh ] && [ -f /usr/bin/sh ]; then ln -s /usr/bin/sh /bin/sh; fi && \
-    if [ ! -f /bin/bash ] && [ -f /usr/bin/bash ]; then ln -s /usr/bin/bash /bin/bash; fi
+#RUN if [ ! -f /bin/sh ] && [ -f /usr/bin/sh ]; then ln -s /usr/bin/sh /bin/sh; fi && \
+#    if [ ! -f /bin/bash ] && [ -f /usr/bin/bash ]; then ln -s /usr/bin/bash /bin/bash; fi
 	
 ################
 # 4 Entrypoint #
