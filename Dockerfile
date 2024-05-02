@@ -1,46 +1,29 @@
-FROM vingerha/gazpar_2_mqtt
-# make sure to run bash all the time
-RUN rm /bin/sh && ln -s /bin/bash /bin/sh
-
-##################
-#  Install apps  #
-##################
+FROM python:3.11-slim-bookworm
 
 COPY ./app /app
 COPY ./app /app_temp
-COPY rootfs/ /
 
-# Uses /bin for compatibility purposes
-RUN if [ ! -f /bin/sh ] && [ -f /usr/bin/sh ]; then ln -s /usr/bin/sh /bin/sh; fi && \
-    if [ ! -f /bin/bash ] && [ -f /usr/bin/bash ]; then ln -s /usr/bin/bash /bin/bash; fi
-	
+RUN apt-get update && \ 
+	apt-get install -y curl unzip xvfb libxi6 libgconf-2-4  && \ 
+    apt-get update && \
+    apt-get install -y chromium -y  && \
+    apt-get update && \	
+    rm -rf /var/lib/apt/lists/*
+	    
+RUN mkdir -p /data
 
-################
-# 4 Entrypoint #
-################
-VOLUME [ "/data" ]
-VOLUME [ "/app" ]
-COPY entrypoint.sh /usr/local/bin/
-#COPY config_yaml.sh /usr/local/bin/
-#RUN chmod +x /usr/local/bin/config_yaml.sh
-#CMD ["./config_yaml.sh"]
+ENV LANG en_US.UTF-8
+ENV LC_ALL en_US.UTF-8
+ENV TZ=Europe/Paris
+
+# Install python requirements
+RUN pip3 install --upgrade pip && \
+    pip3 install --no-cache-dir -r /app/requirement.txt
+
 COPY install_bashio.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/install_bashio.sh
 CMD ./install_bashio.sh
+COPY entrypoint.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/entrypoint.sh
-
 ENTRYPOINT ["entrypoint.sh"]
-CMD ["entrypoint.sh"]
-
 CMD ["python3", "app/gazpar2mqtt.py"]
-
-############
-# 5 Labels #
-############
-
-LABEL \
-  io.hass.version="0.2.0" \
-  io.hass.type="addon" \
-  io.hass.arch="armv7|amd64|arm64"
-
-
