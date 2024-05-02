@@ -16,14 +16,12 @@ RUN if [ ! -f /bin/sh ] && [ -f /usr/bin/sh ]; then ln -s /usr/bin/sh /bin/sh; f
 	
 RUN \
     set -x \
-    && mkdir -p /usr/src/bashio \
-    && curl -L -f -s "https://github.com/hassio-addons/bashio/archive/v0.16.2.tar.gz" \
-        | tar -xzf - --strip 1 -C /usr/src/bashio \
-    && mv /usr/src/bashio/lib /usr/lib/bashio \
-    && ln -s /usr/lib/bashio/bashio /usr/bin/bashio \
-    \
-    && rm -rf /var/lib/apt/lists/* \
-    && rm -rf /usr/src/*
+	&& mkdir -p /tmp/bashio \
+	&& curl -f -L -s -S "https://github.com/hassio-addons/bashio/archive/v0.16.2.tar.gz" | tar -xzf - --strip 1 -C /tmp/bashio \
+	&& mv /tmp/bashio/lib /usr/lib/bashio \
+	&& ln -s /usr/lib/bashio/bashio /usr/bin/bashio \
+	&& rm -rf /tmp/bashio \
+	&& echo "Bashio install"
 	
 ################
 # 4 Entrypoint #
