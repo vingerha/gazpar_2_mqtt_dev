@@ -14,7 +14,7 @@ arch:
 map:
   - addon_config:rw
   - homeassistant_config:rw  
-  - all_addon_configs:rw
+  - all_addon_config:rw
 services:
   - mqtt:need  
 options:
