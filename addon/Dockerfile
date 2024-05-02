@@ -1,4 +1,4 @@
-FROM vingerha/gazpar_2_mqtt
+FROM vingerha/gazpar_2_mqtt_dev
 # make sure to run bash all the time
 RUN rm /bin/sh && ln -s /bin/bash /bin/sh
 
