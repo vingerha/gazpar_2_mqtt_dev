@@ -26,7 +26,7 @@ COPY entrypoint.sh /usr/local/bin/
 #CMD ["./config_yaml.sh"]
 COPY install_bashio.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/install_bashio.sh
-CMD [ "install_bashio.sh" ]
+CMD ./install_bashio.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
 
 ENTRYPOINT ["entrypoint.sh"]

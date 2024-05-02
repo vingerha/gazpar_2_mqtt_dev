@@ -4,6 +4,7 @@ version: "0.3.0"
 slug: "gazpar_2_mqtt"
 init: false
 homeassistant_api: true
+host_network: true
 arch:
   - aarch64
   - amd64
