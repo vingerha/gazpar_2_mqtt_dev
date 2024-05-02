@@ -139,9 +139,7 @@ class Params:
         "--debug",            help="Enable debug mode")
     
     return self.parser.parse_args()
-  
-  
-      
+
   # Load params from Os environment variables 
   def getFromOs(self):
     
@@ -189,6 +187,7 @@ class Params:
     if "DB_PATH" in os.environ: self.dbPath = os.environ["DB_PATH"]
     
     if "DEBUG_MODE" in os.environ: self.debug = _isItTrue(os.environ["DEBUG_MODE"])
+    logging.info("Debug mode OS : Enable = %s", self.debug)
   
   
   # Get params from arguments in command line
@@ -220,7 +219,7 @@ class Params:
     if self.args.db_path is not None: self.db_path = self.args.db_path
       
     if self.args.debug is not None: self.debug = _isItTrue(self.args.debug)
-    
+    logging.info("Debug mode ARGS : Enable = %s", self.debug)
     
   # Check parameters
   def checkParams(self):
@@ -250,7 +249,7 @@ class Params:
                  self.mqttHost, self.mqttPort, self.mqttClientId,
                  self.mqttQos,self.mqttTopic,self.mqttRetain,
                  self.mqttSsl),
-    logging.info("Logs folder: %s, download_folder: %s, chomedriver: %s", self.download_folder, self.logs_folder, self.chromedriver)
+    logging.info("Browser Logs folder: %s, download_folder: %s, chomedriver: %s, screenshots: %s", self.download_folder, self.logs_folder, self.chromedriver, self.screenshots)
     logging.info("Standlone mode : Enable = %s", self.standalone)
     logging.info("Home Assistant discovery : Enable = %s, Topic prefix = %s, Device name = %s",
                  self.hassDiscovery, self.hassPrefix, self.hassDeviceName)
