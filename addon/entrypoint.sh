@@ -3,8 +3,6 @@
 set -e
 
 echo "Load environment vars"
-set -e
-
 ####################
 # LOAD CONFIG.YAML #
 ####################
