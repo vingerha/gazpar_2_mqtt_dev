@@ -1,4 +1,4 @@
-ARG BUILD_FROM=ghcr.io/hassio-addons/alpine-base:7.3.3
+ARG BUILD_FROM=ghcr.io/hassio-addons/base
 # hadolint ignore=DL3006
 FROM ${BUILD_FROM}
 
