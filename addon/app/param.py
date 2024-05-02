@@ -165,7 +165,12 @@ class Params:
     if "HASS_PREFIX" in os.environ: self.hassPrefix = os.environ["HASS_PREFIX"]
     if "HASS_DEVICE_NAME" in os.environ: self.hassDeviceName = os.environ["HASS_DEVICE_NAME"]
     
-    if "HASS_LTS" in os.environ: self.hassLts = os.environ["HASS_LTS"]
+    if "BROWSER_LOGS_FOLDER" in os.environ: self.logs_folder = os.environ["BROWSER_LOGS_FOLDER"]
+    if "BROWSER_DOWNLOAD_FOLDER" in os.environ: self.download_folder = os.environ["BROWSER_DOWNLOAD_FOLDER"]
+    if "BROWSER_SCREENSHOTS" in os.environ: self.screenshots = _isItTrue["BROWSER_SCREENSHOTS"]
+    if "BROWSER_VERBOSE" in os.environ: self.verbose = _isItTrue["BROWSER_VERBOSE"]    
+   
+    if "HASS_LTS" in os.environ: self.hassLts = _isItTrue(os.environ["HASS_LTS"])
     if "HASS_LTS_TOKEN" in os.environ: self.hassToken = os.environ["HASS_LTS_TOKEN"]
     if "HASS_LTS_URI" in os.environ: self.hassStatisticsUri = os.environ["HASS_LTS_URI"]
     if "HASS_LTS_HOST" in os.environ: self.hassHost = os.environ["HASS_LTS_HOST"]
@@ -241,12 +246,10 @@ class Params:
     
     logging.info("GRDF config : username = %s, password = %s", "******@****.**", "******")
     logging.debug("GRDF config : username = %s, password = %s", self.grdfUsername, self.grdfPassword)
-    logging.info("MQTT broker config : host = %s, port = %s, clientId = %s, qos = %s, topic = %s, retain = %s, ssl = %s, user = %s, pwd = %s",
+    logging.info("MQTT broker config : host = %s, port = %s, clientId = %s, qos = %s, topic = %s, retain = %s, ssl = %s",
                  self.mqttHost, self.mqttPort, self.mqttClientId,
                  self.mqttQos,self.mqttTopic,self.mqttRetain,
-                 self.mqttSsl,
-                 self.mqttUsername,
-                 self.mqttPassword),
+                 self.mqttSsl),
     logging.info("Logs folder: %s, download_folder: %s, chomedriver: %s", self.download_folder, self.logs_folder, self.chromedriver)
     logging.info("Standlone mode : Enable = %s", self.standalone)
     logging.info("Home Assistant discovery : Enable = %s, Topic prefix = %s, Device name = %s",
