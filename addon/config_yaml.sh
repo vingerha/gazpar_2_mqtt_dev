@@ -1,5 +1,4 @@
-#!/command/with-contenv bashio
-# shellcheck shell=bash
+#!/bin/sh
 echo "Load environment vars"
 set -e
 

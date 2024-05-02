@@ -1,6 +1,24 @@
 #!/bin/sh
 set -e
 
+echo "Load environment vars"
+set -e
+
+####################
+# LOAD CONFIG.YAML #
+####################
+
+# Exit if /config is not mounted
+if [ ! -d /config ]; then
+	echo "Error: /config not mounted"
+    exit 0
+fi
+
+# Default location
+CONFIGSOURCE="/config/gazpar_2_mqtt/config.yaml"
+echo "Config source: $CONFIGSOURCE"
+mkdir -p -v /config/gazpar_2_mqtt
+
 if [ ! -z "$GAZPAR_2_MQTT_APP" ]; then
     APP="$GAZPAR_2_MQTT_APP"
 else
