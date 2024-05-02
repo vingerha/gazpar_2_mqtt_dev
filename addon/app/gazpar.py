@@ -220,7 +220,7 @@ class Grdf:
         """
         Get screenshot and save to file in logs_folder
         """
-        fn_img = os.path.join(self.location, basename)
+        fn_img = os.path.join(self.location.replace('"', '').replace("'",""), basename)
         # Screenshots are only for debug, so errors are not blocking.
         try:
             logging.debug(f"Grab screenshot and Save: {fn_img}")
