@@ -63,7 +63,7 @@ class Params:
     self.dbPath = '/data'
     
     # Debug param
-    self.debug = True
+    self.debug = False
     
     # Threshold param
     self.thresholdPercentage = 80
@@ -241,7 +241,7 @@ class Params:
   def logParams(self):
     
     logging.info("GRDF config : username = %s, password = %s", "******@****.**", "******")
-    logging.debug("GRDF config : username = %s, password = %s", self.grdfUsername, self.grdfPassword)
+    logging.info("GRDF config : username = %s, password = %s", self.grdfUsername, self.grdfPassword)
     logging.info("MQTT broker config : host = %s, port = %s, clientId = %s, qos = %s, topic = %s, retain = %s, ssl = %s",
                  self.mqttHost, self.mqttPort, self.mqttClientId,
                  self.mqttQos,self.mqttTopic,self.mqttRetain,
