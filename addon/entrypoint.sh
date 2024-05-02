@@ -19,6 +19,19 @@ CONFIGSOURCE="/config/gazpar_2_mqtt/config.yaml"
 echo "Config source: $CONFIGSOURCE"
 mkdir -p -v /config/gazpar_2_mqtt
 
+# Migrate if needed
+echo "before migrate 2"
+cp -rf /homeassistant/gazpar_2_mqtt/* /config/gazpar_2_mqtt/ 
+
+# Check if config file is there, or create one from template
+if [ ! -f "$CONFIGSOURCE" ]; then
+    echo "... no config file found, Please create $CONFIGSOURCE "
+fi
+
+########################
+# LOAD CONFIG.YAML END #
+########################
+
 if [ ! -z "$GAZPAR_2_MQTT_APP" ]; then
     APP="$GAZPAR_2_MQTT_APP"
 else
