@@ -241,10 +241,12 @@ class Params:
     
     logging.info("GRDF config : username = %s, password = %s", "******@****.**", "******")
     logging.debug("GRDF config : username = %s, password = %s", self.grdfUsername, self.grdfPassword)
-    logging.info("MQTT broker config : host = %s, port = %s, clientId = %s, qos = %s, topic = %s, retain = %s, ssl = %s",
+    logging.info("MQTT broker config : host = %s, port = %s, clientId = %s, qos = %s, topic = %s, retain = %s, ssl = %s, user = %s, pwd = %s",
                  self.mqttHost, self.mqttPort, self.mqttClientId,
                  self.mqttQos,self.mqttTopic,self.mqttRetain,
-                 self.mqttSsl),
+                 self.mqttSsl,
+                 self.mqttUsername,
+                 self.mqttPassword),
     logging.info("Logs folder: %s, download_folder: %s, chomedriver: %s", self.download_folder, self.logs_folder, self.chromedriver)
     logging.info("Standlone mode : Enable = %s", self.standalone)
     logging.info("Home Assistant discovery : Enable = %s, Topic prefix = %s, Device name = %s",
