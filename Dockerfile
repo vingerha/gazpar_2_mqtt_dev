@@ -1,6 +1,5 @@
-ARG BUILD_FROM=ghcr.io/hassio-addons/debian-base
-# hadolint ignore=DL3006
-FROM $BUILD_FROM
+ARG BUILD_FROM
+FROM ${BUILD_FROM}
 
 COPY ./app /app
 COPY ./app /app_temp
@@ -10,7 +9,10 @@ RUN apt-get update && \
     apt-get update && \
     apt-get install -y chromium -y  && \
     apt-get update && \	
-    rm -rf /var/lib/apt/lists/*
+	apt-get install python3 -y && \
+	apt-get update && \	
+    apt-get install python3-pip -y && \
+    rm -rf /var/lib/apt/lists/* 
 	    
 RUN mkdir -p /data
 
