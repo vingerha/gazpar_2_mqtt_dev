@@ -5,15 +5,25 @@ FROM ${BUILD_FROM}
 COPY ./app /app
 COPY ./app /app_temp
 
-RUN apt-get update && \ 
-	apt-get install -y curl unzip xvfb libxi6 libgconf-2-4  && \ 
-    apt-get update && \
-    apt-get install -y chromium -y  && \
-    apt-get update && \	
-	apt-get install python3 -y && \
-	apt-get update && \	
-    apt-get install python3-pip -y && \
-    rm -rf /var/lib/apt/lists/* 
+RUN apk add --no-cache \
+        py-urllib3 \
+        py3-colorama \
+        xvfb \
+        py3-pip \
+        xorg-server-xephyr \
+        chromium-chromedriver \
+        chromium \
+        py3-openssl \
+        py3-pysocks \
+        py3-wsproto \
+        py3-requests \
+        py3-sniffio \
+        py3-async_generator \
+        py3-sortedcontainers \
+        py3-attrs \
+        py3-outcome \
+        py3-trio \
+        py3-paho-mqtt	
 	    
 RUN mkdir -p /data
 
