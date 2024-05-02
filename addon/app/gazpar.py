@@ -241,7 +241,7 @@ class Grdf:
                 logging.debug(f"Could not dump html {fn_html}: {e}")
                 
     # Login
-    def login(self,username,password, screenshot: bool = False, verbose: bool = False, download_folder):
+    def login(self,username,password, download_folder, screenshot: bool = False, verbose: bool = False):
         HEADERS = {
             "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/111.0",
             "Accept": "application/json, text/plain, */*",
