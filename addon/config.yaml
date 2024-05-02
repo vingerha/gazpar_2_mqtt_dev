@@ -16,6 +16,8 @@ map:
   - all_addon_configs:rw
 options:
   verbose: true
+  mqtt_autodiscover: true
 schema:
   verbose: bool?
   log_level: list(trace|debug|info|notice|warning|error|fatal)?
+  mqtt_autodiscover: bool?
