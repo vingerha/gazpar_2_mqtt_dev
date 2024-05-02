@@ -19,12 +19,15 @@ RUN if [ ! -f /bin/sh ] && [ -f /usr/bin/sh ]; then ln -s /usr/bin/sh /bin/sh; f
 VOLUME [ "/data" ]
 VOLUME [ "/app" ]
 COPY entrypoint.sh /usr/local/bin/
-COPY config_yaml.sh /usr/local/bin/
-RUN chmod +x /usr/local/bin/config_yaml.sh
+#COPY config_yaml.sh /usr/local/bin/
+#RUN chmod +x /usr/local/bin/config_yaml.sh
+COPY config_yaml.sh /app/config_yaml.sh
+RUN chmod a+x /app/config_yaml.sh
+
 RUN chmod +x /usr/local/bin/entrypoint.sh
 ENTRYPOINT ["entrypoint.sh"]
 CMD ["entrypoint.sh"]
-CMD ["config_yaml.sh"]
+CMD ["./config_yaml.sh"]
 CMD ["python3", "app/gazpar2mqtt.py"]
 
 ############
