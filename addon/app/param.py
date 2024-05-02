@@ -55,7 +55,7 @@ class Params:
     self.chromedriver = "/usr/bin/chromedriver"
     self.download_folder = "./"
     self.logs_folder = "./"
-    self.screenshots = False
+    self.screenshots = True
     self.verbose = False
     
     # Database params
@@ -63,7 +63,7 @@ class Params:
     self.dbPath = '/data'
     
     # Debug param
-    self.debug = False
+    self.debug = True
     
     # Threshold param
     self.thresholdPercentage = 80
@@ -186,9 +186,7 @@ class Params:
     if "DB_INIT" in os.environ: self.dbInit = _isItTrue(os.environ["DB_INIT"])
     if "DB_PATH" in os.environ: self.dbPath = os.environ["DB_PATH"]
     
-    if "DEBUG_MODE" in os.environ: self.debug = _isItTrue(os.environ["DEBUG_MODE"])
-    logging.info("Debug mode OS : Enable = %s", self.debug)
-  
+    if "DEBUG_MODE" in os.environ: self.debug = _isItTrue(os.environ["DEBUG_MODE"]) 
   
   # Get params from arguments in command line
   def getFromArgs(self):
@@ -219,8 +217,7 @@ class Params:
     if self.args.db_path is not None: self.db_path = self.args.db_path
       
     if self.args.debug is not None: self.debug = _isItTrue(self.args.debug)
-    logging.info("Debug mode ARGS : Enable = %s", self.debug)
-    
+       
   # Check parameters
   def checkParams(self):
     
