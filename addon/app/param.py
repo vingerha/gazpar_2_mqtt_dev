@@ -55,7 +55,7 @@ class Params:
     self.chromedriver = "/usr/bin/chromedriver"
     self.download_folder = "./"
     self.logs_folder = "./"
-    self.screenshots = True
+    self.screenshots = False
     self.verbose = False
     
     # Database params
@@ -143,8 +143,8 @@ class Params:
   # Load params from Os environment variables 
   def getFromOs(self):
     
-    if "GRDF_USERNAME" in os.environ: self.grdfUsername = os.environ["GRDF_USERNAME"].replace('"', '').replace("'","")
-    if "GRDF_PASSWORD" in os.environ: self.grdfPassword = os.environ["GRDF_PASSWORD"].replace('"', '').replace("'","")
+    if "GRDF_USERNAME" in os.environ: self.grdfUsername = os.environ["GRDF_USERNAME"]
+    if "GRDF_PASSWORD" in os.environ: self.grdfPassword = os.environ["GRDF_PASSWORD"]
       
     if "MQTT_HOST" in os.environ: self.mqttHost = os.environ["MQTT_HOST"]
     if "MQTT_PORT" in os.environ: self.mqttPort = int(os.environ["MQTT_PORT"])
