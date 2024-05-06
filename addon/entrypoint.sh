@@ -1,8 +1,6 @@
 #!/usr/bin/env bashio
 # shellcheck shell=bash
 set -e
-
-echo "Load environment vars"
 ####################
 # LOAD CONFIG.YAML #
 ####################
@@ -14,18 +12,22 @@ if [ ! -d /config ]; then
 fi
 
 # Default location
+CONFIGTEMPLATE="/templates/config.yaml"
 CONFIGSOURCE="/config/gazpar_2_mqtt/config.yaml"
-echo "Config source: $CONFIGSOURCE"
-mkdir -p -v /config/gazpar_2_mqtt
+CONFIGUSERDIR="/homeassistant/gazpar_2_mqtt"
+CONFIGUSER="/homeassistant/gazpar_2_mqtt/config.yaml"
 
-# Migrate if needed
-echo "before migrate 2"
-cp -rf /homeassistant/gazpar_2_mqtt/* /config/gazpar_2_mqtt/ 
+mkdir -p /config/gazpar_2_mqtt
 
-# Check if config file is there, or create one from template
-if [ ! -f "$CONFIGSOURCE" ]; then
-    echo "... no config file found, Please create $CONFIGSOURCE "
+
+if [ ! -f "$CONFIGUSER" ]; then
+    echo "... no config basis file found. Copying template to $CONFIGUSER, please adapt this and restart"
+	mkdir -p "$CONFIGUSERDIR"
+	cp -rf "$CONFIGTEMPLATE" "$CONFIGUSER"
+	exit 1
 fi
+
+cp -rf "$CONFIGUSER" "$CONFIGSOURCE"
 
 # Export all yaml entries as env variables
 
@@ -72,7 +74,6 @@ while IFS= read -r line; do
         echo "$line does not follow the correct structure. Please check your yaml file."
     fi
 done <"$CONFIGSOURCE"
-echo "End of config_yaml"
 
 ########################
 # LOAD CONFIG.YAML END #
@@ -110,25 +111,6 @@ fi
 # Autodiscover mqtt end #
 ####################
 
-
 APP="/app"
-
-
-echo "Using '$APP' as APP directory"
-
-echo "Copying default app/*.py files to app (except param.py)..."
-cp /app_temp/database.py "$APP/database.py"
-cp /app_temp/gazpar.py "$APP/gazpar.py"
-cp /app_temp/gazpar2mqtt.py "$APP/gazpar2mqtt.py"
-cp /app_temp/hass.py "$APP/hass.py"
-cp /app_temp/influxdb.py "$APP/influxdb.py"
-cp /app_temp/mqtt.py "$APP/mqtt.py"
-cp /app_temp/price.py "$APP/price.py"
-cp /app_temp/standalone.py "$APP/standalone.py"
-
-if [ ! -f "$APP/param.py" ]; then
-    echo "param.py non existing, copying default to /app..."
-    cp /app_temp/param.py "$APP/param.py"
-fi
 
 exec "$@"

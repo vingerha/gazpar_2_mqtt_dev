@@ -28,11 +28,6 @@ services:
       #MQTT_QOS: '1'
       #MQTT_RETAIN: 'True'
       #MQTT_SSL: 'False'
-      
-      #BROWSER_LOGS_FOLDER: './' # should only be used for debug purposes
-      #BROWSER_DOWNLOAD_FOLDER: './'  # should only be used for debug purposes
-      #BROWSER_SCREENSHOTS: 'False'  # should only be used for debug purposes
-      #BROWSER_VERBOSE: 'False'  # should only be used for debug purposes
 
       #HASS_DISCOVERY: 'False'
       #HASS_PREFIX: 'homeassistant'
