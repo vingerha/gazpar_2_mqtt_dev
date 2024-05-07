@@ -701,7 +701,7 @@ def run(myParams):
                 "keyfile": myParams.hassSslKeyfile
                 }
             
-            logging.debug(f"Writing Websocket Home Assistant LTS for PCE: {myPce.pceId}, sensor name: {sensor_name}")
+            logging.debug(f"Writing Websocket Home Assistant LTS for PCE: {myPce.pceId}, sensor name: {myParams.hassLtsSensorName}")
             HomeAssistantWs(myPce.pceId, myParams.hassHost.split('//')[1], myParams.hassSsl, ssl_data, myParams.hassToken, myParams.hassLtsSensorName, stats_array)
                    
         except Exception as e:

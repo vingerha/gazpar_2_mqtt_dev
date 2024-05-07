@@ -1,4 +1,4 @@
-FROM vingerha/gazpar_2_mqtt
+FROM vingerha/gazpar_2_mqtt_dev
 
 ##################
 #  Install apps  #
