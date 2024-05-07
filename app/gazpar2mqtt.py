@@ -377,7 +377,7 @@ def run(myParams):
             logging.info("-----------------------------------------------------------")
             logging.info("#           Stand alone publication mode                  #")
             logging.info("-----------------------------------------------------------")
-
+            
             # Loop on PCEs
             for myPce in myGrdf.pceList:
 
@@ -480,13 +480,14 @@ def run(myParams):
                     myMqtt.publish(mySa.histoTopic+"rolling_week_last_year_gas", myPce.gasR1WY1)
                     myMqtt.publish(mySa.histoTopic+"rolling_week_last_2_year_gas", myPce.gasR1WY2)
 
-                    ### Thresholds
-                    myMqtt.publish(mySa.thresholdTopic+"current_month_threshold", myPce.tshM0)
-                    myMqtt.publish(mySa.thresholdTopic+"current_month_threshold_percentage", myPce.tshM0Pct)
-                    myMqtt.publish(mySa.thresholdTopic+"current_month_threshold_warning", myPce.tshM0Warn)
-                    myMqtt.publish(mySa.thresholdTopic+"previous_month_threshold", myPce.tshM1)
-                    myMqtt.publish(mySa.thresholdTopic+"previous_month_threshold_percentage", myPce.tshM1Pct)
-                    myMqtt.publish(mySa.thresholdTopic+"previous_month_threshold_warning", myPce.tshM1Warn)
+                    ### Thresholds, only if existing
+                    if myPce.tshM0:
+                        myMqtt.publish(mySa.thresholdTopic+"current_month_threshold", myPce.tshM0)
+                        myMqtt.publish(mySa.thresholdTopic+"current_month_threshold_percentage", myPce.tshM0Pct)
+                        myMqtt.publish(mySa.thresholdTopic+"current_month_threshold_warning", myPce.tshM0Warn)
+                        myMqtt.publish(mySa.thresholdTopic+"previous_month_threshold", myPce.tshM1)
+                        myMqtt.publish(mySa.thresholdTopic+"previous_month_threshold_percentage", myPce.tshM1Pct)
+                        myMqtt.publish(mySa.thresholdTopic+"previous_month_threshold_warning", myPce.tshM1Warn)
 
                     logging.info("All measures published !")
 
@@ -666,53 +667,7 @@ def run(myParams):
     ####################################################################################################################
     if myParams.hassLts \
         and myGrdf.isConnected:
-
-        try:
-            logging.info("-----------------------------------------------------------")
-            logging.info("#           Home assistant Long Term Statistics           #")
-            logging.info("-----------------------------------------------------------")
-
-            # Load database in cache
-            myDb.load()
-            
-            sensor_name = myParams.hassLtsSensorName
-            data = {}
-            # Loop on PCEs
-            for myPce in myDb.pceList:
-                logging.info("Writing informations of PCE %s alias %s...", myPce.pceId, myPce.alias)
-
-                stats_array = []
-                for myMeasure in myPce.measureList:
-                    date_with_timezone = myMeasure.date.replace(tzinfo=dt.timezone.utc)
-                    date_formatted = date_with_timezone.strftime(
-                        "%Y-%m-%dT%H:%M:%S%z"
-                    )
-                    stat = {
-                        "start": date_formatted,  # formatted date
-                        "state": myMeasure.volumeGross,
-                        "sum": myMeasure.endIndex,
-                    }
-                    # Add the stat to the array
-                    if myMeasure.type == 'informative':
-                        stats_array.append(stat)
-                
-                data = {
-                    "has_mean": False,
-                    "has_sum": True,
-                    "statistic_id": (
-                        sensor_name + "_" + myPce.pceId
-                            ),
-                    "unit_of_measurement": "m³",
-                    "source": "recorder",
-                    "stats": stats_array,
-                }
-                
-            logging.debug(f"Writing HA LTS for PCE: {myPce.pceId}, sensor name: {sensor_name}, data: {data}")
-
-            myGrdf.open_url(myParams.hassHost, myParams.hassStatisticsUri, myParams.hassToken, data)
-        except Exception as e:
-            logging.error("Home Assistant Long Term Statistics : unable to publish LTS to HA with error: %s", e)
-
+        
         try: 
             logging.info("-----------------------------------------------------------")
             logging.info("#   Home assistant Long Term Statistics (WebService)      #")
@@ -750,7 +705,56 @@ def run(myParams):
             HomeAssistantWs(myPce.pceId, myParams.hassHost.split('//')[1], myParams.hassSsl, ssl_data, myParams.hassToken, myParams.hassLtsSensorName, stats_array)
                    
         except Exception as e:
-            logging.error("Home Assistant Long Term Statistics : unable to publish LTS to HA with error: %s", e)    
+            logging.error("Home Assistant Long Term Statistics : unable to publish LTS to Webservice HA with error: %s", e)
+            logging.error("Retrying witj API") 
+
+            try:
+                logging.info("-----------------------------------------------------------")
+                logging.info("#      Home assistant Long Term Statistics (API)          #")
+                logging.info("-----------------------------------------------------------")
+
+                # Load database in cache
+                myDb.load()
+                
+                sensor_name = myParams.hassLtsSensorName
+                data = {}
+                # Loop on PCEs
+                for myPce in myDb.pceList:
+                    logging.info("Writing api information of PCE %s alias %s...", myPce.pceId, myPce.alias)
+
+                    stats_array = []
+                    for myMeasure in myPce.measureList:
+                        date_with_timezone = myMeasure.date.replace(tzinfo=dt.timezone.utc)
+                        date_formatted = date_with_timezone.strftime(
+                            "%Y-%m-%dT%H:%M:%S%z"
+                        )
+                        stat = {
+                            "start": date_formatted,  # formatted date
+                            "state": myMeasure.volumeGross,
+                            "sum": myMeasure.endIndex,
+                        }
+                        # Add the stat to the array
+                        if myMeasure.type == 'informative':
+                            stats_array.append(stat)
+                    
+                    data = {
+                        "has_mean": False,
+                        "has_sum": True,
+                        "statistic_id": (
+                            sensor_name + "_" + myPce.pceId
+                                ),
+                        "unit_of_measurement": "m³",
+                        "source": "recorder",
+                        "stats": stats_array,
+                    }
+                    
+                logging.debug(f"Writing HA LTS for PCE: {myPce.pceId}, sensor name: {sensor_name}, data: {data}")
+
+                myGrdf.open_url(myParams.hassHost, myParams.hassStatisticsUri, myParams.hassToken, data)
+            except Exception as e:
+                logging.error("Home Assistant Long Term Statistics : unable to publish LTS to HA with error: %s", e)
+
+           
 
     ####################################################################################################################
     # STEP 6 : Disconnect mqtt broker
