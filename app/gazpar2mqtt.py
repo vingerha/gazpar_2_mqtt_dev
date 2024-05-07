@@ -748,7 +748,7 @@ def run(myParams):
                         "stats": stats_array,
                     }
                     
-                logging.debug(f"Writing HA LTS for PCE: {myPce.pceId}, sensor name: {sensor_name}, data: {data}")
+                logging.debug(f"Writing HA LTS for PCE: {myPce.pceId}, sensor name: {myParams.hassLtsSensorName}, data: {data}")
 
                 myGrdf.open_url(myParams.hassHost, myParams.hassStatisticsUri, myParams.hassToken, data)
             except Exception as e:
