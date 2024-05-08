@@ -3,7 +3,7 @@ version: '3.5'
 services:
   gazpar2mqtt:
     container_name: gazpar_2_mqtt
-    image: vingerha/gazpar_2_mqtt:latest
+    image: vingerha/gazpar_2_mqtt_dev:latest
     tty: true
     restart: unless-stopped
     # network_mode can be used then you have connectivity issues, e.g. with Influx

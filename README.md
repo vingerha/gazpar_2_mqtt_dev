@@ -1,4 +1,5 @@
 ![GitHub release (with filter)](https://img.shields.io/github/v/release/vingerha/gazpar_2_mqtt)
+
 ## Introduction / status
 
 Reworked from the great repo by yukulehe/gazpar2mqtt (who also provided a large part of the docu), now that GRDF is again without Captcha.
@@ -13,6 +14,9 @@ Main differences are in the login method, now using virtual browser (old method 
 For usage and installation etc. see [DOCUMENTATION](https://github.com/vingerha/gazpar_2_mqtt/wiki)
 
 ## Changelogs :
+- 0.5.0
+  - Use webservice for loading data to Home Assistant, previously this was a spook (app) api
+  - collect published measures (periodically values registered by GRDF)
 - 0.4.1
   - initial fix to load also published (non-daily) data, may need a rebuild of the db
   - reduce non-needed stuff for the addon
@@ -22,11 +26,7 @@ For usage and installation etc. see [DOCUMENTATION](https://github.com/vingerha/
 - 0.3.0 (container only)
   - enable Influx also from docker-compose parameters
   - set log directory one step higher to avoid adding logs into /app
-- 0.2.0 (container only)
-  - add export to HA Long Term Statistic
-- 0.1.0 (container only)
-  - Basis from yukulehe/gazpar2mqtt
-  - add login via selenium
+... history removed
   
 ## Roadmap :
 
