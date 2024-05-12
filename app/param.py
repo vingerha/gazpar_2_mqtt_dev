@@ -23,6 +23,7 @@ class Params:
     # Grdf params
     self.grdfUsername = 'xxx'
     self.grdfPassword = 'xxx'
+    self.grdfStartDate = '2020-01-01'
     
     # Mqtt params
     self.mqttHost = '192.168.x.y'
@@ -47,7 +48,6 @@ class Params:
     # Publication in HA long term statistics 
     self.hassLts = False    
     self.hassLtsDelete = False
-    self.hassLtsSensorName = "sensor.gazpar2mqtt_total"
     self.hassToken = ""  # Long-Lived Access Token
     self.hassStatisticsUri = "/api/services/recorder/import_statistics"
     self.hassHost = "http://192.168.x.y:8213"  
@@ -153,6 +153,8 @@ class Params:
     
     if "GRDF_USERNAME" in os.environ: self.grdfUsername = os.environ["GRDF_USERNAME"]
     if "GRDF_PASSWORD" in os.environ: self.grdfPassword = os.environ["GRDF_PASSWORD"]
+    if "GRDF_STARTDATE" in os.environ: self.grdfStartDate = os.environ["GRDF_STARTDATE"]
+
       
     if "MQTT_HOST" in os.environ: self.mqttHost = os.environ["MQTT_HOST"]
     if "MQTT_PORT" in os.environ: self.mqttPort = int(os.environ["MQTT_PORT"])
@@ -199,7 +201,11 @@ class Params:
       
     if "DB_INIT" in os.environ: self.dbInit = _isItTrue(os.environ["DB_INIT"])
     if "DB_PATH" in os.environ: self.dbPath = os.environ["DB_PATH"]
-    
+
+    if "PRICE_KWH" in os.environ: self.priceKwhDefault = os.environ["PRICE_KWH"]    
+    if "PRICE_FIX" in os.environ: self.priceFixDefault = os.environ["PRICE_FIX"]     
+    if "PRICE_PATH" in os.environ: self.pricePath = os.environ["PRICE_PATH"]     
+
     if "DEBUG" in os.environ: self.debug = _isItTrue(os.environ["DEBUG"])
   
   
