@@ -176,9 +176,9 @@ class Grdf:
             self.location,
             "chromedriver.log",
         )
-
+        
         logging.debug(
-            f" Chromium service args: {chromium_service_args}"
+            f" Chromedriver log {chromedriver_log}, service args: {chromium_service_args}"
         )
         logging.debug("Start the browser")
 
@@ -207,8 +207,8 @@ class Grdf:
         except AttributeError:
             logging.debug("chromium unknown in selenium webdriver")
             raise
-        except Exception:
-            logging.debug("Exception in trying to start chromium browser")
+        except Exception as e:
+            logging.debug("Exception in trying to start chromium browser: %s", e)
             raise
         else:
             # Now we know the browser works
