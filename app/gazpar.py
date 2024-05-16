@@ -114,7 +114,7 @@ class Grdf:
             options.add_argument("--disable-dev-shm-usage")
 
         # pylint: disable=condition-evals-to-constant
-        datadir = os.path.expanduser(f"{self.location}/.config/google-chrome")
+        datadir = os.path.expanduser(f"{self.location}.config/google-chrome")
         os.makedirs(datadir, exist_ok=True)
         options.add_argument(f"--user-data-dir={datadir}")
         logging.debug(f"Use {datadir} for Google Chrome user data.")
