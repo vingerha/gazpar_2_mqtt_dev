@@ -114,49 +114,49 @@ class Grdf:
             options.add_argument("--disable-dev-shm-usage")
 
         # pylint: disable=condition-evals-to-constant
-        datadir = os.path.expanduser(f"{self.location}.config/google-chrome")
+        datadir = os.path.expanduser(f"{self.location}/config/google-chrome")
         os.makedirs(datadir, exist_ok=True)
         options.add_argument(f"--user-data-dir={datadir}")
         logging.debug(f"Use {datadir} for Google Chrome user data.")
-        options.add_argument("--mute-audio")
+        #options.add_argument("--mute-audio")
         # if self._use_display:
         #     Does not work well with veolia due to multiple "same" elements
         #     options.add_argument("--auto-open-devtools-for-tabs")
-        options.add_experimental_option(
-            "prefs",
-            {
-                "credentials_enable_service": False,
-                "download.default_directory": "/app",
-                "profile.default_content_settings.popups": 1,
-                "profile.password_manager_enabled": False,
-                "download.prompt_for_download": False,
-                "download.directory_upgrade": True,
-                "extensions_to_open": ",".join(
-                    ["text/csv", "application/json"]
-                ),
-                "safebrowsing.enabled": False,
-            },
-        )
-        options.add_argument("--disable-blink-features=AutomationControlled")
-        options.add_argument("--disable-extensions")
-        options.add_argument("--disable-popup-blocking")
-        options.add_argument("--disable-background-timer-throttling")
-        options.add_argument("--disable-backgrounding-occluded-windows")
-        options.add_argument("--disable-translate")
-        options.add_argument("--disable-notifications")
-        options.add_argument("--disable-infobars")
-        options.add_argument("--disable-logging");
-        options.add_argument("--log-level=0");
-        options.add_argument("--output=/dev/null");
+        #options.add_experimental_option(
+        #    "prefs",
+        #    {
+        #        "credentials_enable_service": False,
+        #        "download.default_directory": "/app",
+        #        "profile.default_content_settings.popups": 1,
+        #        "profile.password_manager_enabled": False,
+        #        "download.prompt_for_download": False,
+        #        "download.directory_upgrade": True,
+        #        "extensions_to_open": ",".join(
+        #            ["text/csv", "application/json"]
+        #        ),
+        #        "safebrowsing.enabled": False,
+        #    },
+        #)
+        #options.add_argument("--disable-blink-features=AutomationControlled")
+        #options.add_argument("--disable-extensions")
+        #options.add_argument("--disable-popup-blocking")
+        #options.add_argument("--disable-background-timer-throttling")
+        #options.add_argument("--disable-backgrounding-occluded-windows")
+        #options.add_argument("--disable-translate")
+        #options.add_argument("--disable-notifications")
+        #options.add_argument("--disable-infobars")
+        #options.add_argument("--disable-logging");
+        #options.add_argument("--log-level=0");
+        #options.add_argument("--output=/dev/null");
         
-        options.add_experimental_option("useAutomationExtension", False)
-        options.add_experimental_option(
-            "excludeSwitches", ["enable-automation"]
-        )
+        #options.add_experimental_option("useAutomationExtension", False)
+        #options.add_experimental_option(
+        #    "excludeSwitches", ["enable-automation"]
+        #)
 
         # always use headless
         options.add_argument("--headless")
-        options.add_argument("window-size=1280,1024")
+        #options.add_argument("window-size=1280,1024")
 
         # No exception up to here, so ok
         chromium_service_args = ""
