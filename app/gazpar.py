@@ -660,7 +660,7 @@ class Grdf:
         self.session.headers.update({"X-Requested-With": "XMLHttpRequest"})
 
         payload = SESSION_TOKEN_PAYLOAD.format(username, password)
-        logging.debug("payload: %s", payload)
+
         response = self.session.post(SESSION_TOKEN_URL, data=payload)
 
         if response.status_code != 200:
