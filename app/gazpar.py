@@ -646,15 +646,13 @@ class Grdf:
                 "warnBeforePasswordExpired": "false"
             }}
         }}"""
-
         AUTH_TOKEN_URL = "https://connexion.grdf.fr/login/sessionCookieRedirect"
         AUTH_TOKEN_PARAMS = """{{
             "checkAccountSetupComplete": "true",
             "token": "{0}",
             "redirectUrl": "https://monespace.grdf.fr"
         }}"""
-
-        self.session = Session()
+        #self.session = Session()
         self.session.headers.update({"domain": "grdf.fr"})
         self.session.headers.update({"Content-Type": "application/json"})
         self.session.headers.update({"X-Requested-With": "XMLHttpRequest"})
@@ -672,27 +670,28 @@ class Grdf:
         session_token = response.json().get("sessionToken")
         logging.debug("Session token: %s", session_token)
         jar = http.cookiejar.CookieJar()
-        session = Session()
-        session.headers.update({"Content-Type": "application/json"})
-        session.headers.update({"X-Requested-With": "XMLHttpRequest"})
+        #self.session = Session()
+        self.session.headers.update({"Content-Type": "application/json"})
+        self.session.headers.update({"X-Requested-With": "XMLHttpRequest"})
 
         params = json.loads(AUTH_TOKEN_PARAMS.format(session_token))
-        response = session.get(AUTH_TOKEN_URL, params=params, allow_redirects=True, cookies=jar)
+   
+        response = self.session.get(AUTH_TOKEN_URL, params=params, allow_redirects=True, cookies=jar)
 
         if response.status_code != 200:
             raise Exception(f"An error occurred while getting the auth token. Status code: {response.status_code} - {response.text}")
             self.isConnected = False
             return
 
-        auth_token = session.cookies.get("auth_token", domain="monespace.grdf.fr")
+        self.auth_token = self.session.cookies.get("auth_token", domain="monespace.grdf.fr")
         
         # Create a session.
-        self.session = Session()
+        #self.session = Session()
         self.session.headers.update({"Host": "monespace.grdf.fr"})
         self.session.headers.update({"Domain": "grdf.fr"})
         self.session.headers.update({"X-Requested-With": "XMLHttpRequest"})
         self.session.headers.update({"Accept": "application/json"})
-        self.session.cookies.set("auth_token", auth_token, domain="monespace.grdf.fr")
+        self.session.cookies.set("auth_token", self.auth_token, domain="monespace.grdf.fr")
                
         # When everything is ok
         self.isConnected = True
@@ -714,15 +713,13 @@ class Grdf:
     def getWhoami(self):
         
         logging.debug("Get whoami...")
-        
         try:
             req = self.session.get('https://monespace.grdf.fr/api/e-connexion/users/whoami')
         except Exception as e:
-            logging.error("Error while calling Whoami:")
+            logging.error("Error while calling whoami:")
             logging.error(str(e))
             self.isConnected = False
-            return None
-
+       
         logging.debug("Whoami result %s", req.text)
         
         # Check returned JSON format
