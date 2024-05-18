@@ -20,7 +20,7 @@ from hass_ws import HomeAssistantWs
 
 
 # gazpar2mqtt constants
-G2M_VERSION = '0.8.3'
+G2M_VERSION = '0.8.4.2'
 G2M_DB_VERSION = '0.4.0'
 G2M_INFLUXDB_VERSION = '0.1.0'
 
@@ -150,31 +150,31 @@ def run(myParams):
         tryCount = 0
         # Connexion
         while tryCount < gazpar.GRDF_API_MAX_RETRIES :
-            try:
+            #try:
 
-                tryCount += 1
+            tryCount += 1
 
-                # Create Grdf instance
-                logging.debug("Connexion to GRDF, try %s/%s...",tryCount,gazpar.GRDF_API_MAX_RETRIES)
-                myGrdf = gazpar.Grdf()
-                logging.debug("After myGrdf...")
-                # Connect to Grdf website
+            # Create Grdf instance
+            logging.debug("Connexion to GRDF, try %s/%s...",tryCount,gazpar.GRDF_API_MAX_RETRIES)
+            myGrdf = gazpar.Grdf()
+            logging.debug("After myGrdf...")
+            # Connect to Grdf website
 
-                myGrdf.login(myParams.grdfUsername,myParams.grdfPassword, myParams.download_folder, myParams.screenshots, myParams.verbose)
+            myGrdf.login(myParams.grdfUsername,myParams.grdfPassword)
 
 
-                # Check connexion
-                if myGrdf.isConnected:
-                    logging.info("GRDF connected !")
-                    break
-                else:
-                    logging.info("Unable to login to GRDF website")
-                    _waitBeforeRetry(tryCount)
-
-            except:
-                myGrdf.isConnected = False
+            # Check connexion
+            if myGrdf.isConnected:
+                logging.info("GRDF connected !")
+                break
+            else:
                 logging.info("Unable to login to GRDF website")
                 _waitBeforeRetry(tryCount)
+
+            #except:
+            #    myGrdf.isConnected = False
+            #    logging.info("Unable to login to GRDF website")
+            #    _waitBeforeRetry(tryCount)
 
 
         # When GRDF is connected

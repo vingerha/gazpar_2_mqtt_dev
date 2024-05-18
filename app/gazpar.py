@@ -1,6 +1,4 @@
 #!/usr/bin/env python3
-
-
 import logging
 import requests
 import json
@@ -9,9 +7,11 @@ import os
 import sys
 import inspect
 import time
+from requests import Session
+import http.cookiejar
 
+### for use with chromium
 global JAVAVXS
-
 import selenium
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -21,7 +21,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.remote.remote_connection import LOGGER, logging
 LOGGER.setLevel(logging.WARNING)
-
+### end for use with chromium
 
 
 # Constants
@@ -32,6 +32,8 @@ GRDF_API_WAIT_BTW_RETRIES = 20 # number of seconds between try 1 and try 2 (must
 GRDF_API_ERRONEOUS_COUNT = 1 # Erroneous number of results send by GRDF
 TYPE_I = 'informative' # type of measure Informative
 TYPE_P = 'published' # type of measure Published
+
+
 
 #######################################################################
 #### Useful functions
@@ -64,9 +66,9 @@ def _getRetryTimeSleep(tryNo):
     return GRDF_API_WAIT_BTW_RETRIES * pow(tryNo,2.5)
 
 #######################################################################
-#### Class GRDF
+#### Class GRDF with chromium, keeping in place in case captcha returns
 #######################################################################
-class Grdf:
+class Grdf_Chromium:
     site_grdf_url = "https://monespace.grdf.fr/client/particulier/consommation"
     # Constructor
     def __init__(self):
@@ -90,14 +92,12 @@ class Grdf:
             'Accept':'application/json, */*',
             'Connection': 'keep-alive'
         }  
-        
+
     def init(self):
         self.init_chromium()
         logging.debug("Chromium init done")
         return
 
-     
-        
     def init_chromium(self):
         options = webdriver.ChromeOptions()
         # Set Chrome options
@@ -114,49 +114,49 @@ class Grdf:
             options.add_argument("--disable-dev-shm-usage")
 
         # pylint: disable=condition-evals-to-constant
-        datadir = os.path.expanduser(f"{self.location}.config/google-chrome")
+        datadir = os.path.expanduser(f"{self.location}/config/google-chrome")
         os.makedirs(datadir, exist_ok=True)
         options.add_argument(f"--user-data-dir={datadir}")
         logging.debug(f"Use {datadir} for Google Chrome user data.")
-        options.add_argument("--mute-audio")
+        #options.add_argument("--mute-audio")
         # if self._use_display:
         #     Does not work well with veolia due to multiple "same" elements
         #     options.add_argument("--auto-open-devtools-for-tabs")
-        options.add_experimental_option(
-            "prefs",
-            {
-                "credentials_enable_service": False,
-                "download.default_directory": "/app",
-                "profile.default_content_settings.popups": 1,
-                "profile.password_manager_enabled": False,
-                "download.prompt_for_download": False,
-                "download.directory_upgrade": True,
-                "extensions_to_open": ",".join(
-                    ["text/csv", "application/json"]
-                ),
-                "safebrowsing.enabled": False,
-            },
-        )
-        options.add_argument("--disable-blink-features=AutomationControlled")
-        options.add_argument("--disable-extensions")
-        options.add_argument("--disable-popup-blocking")
-        options.add_argument("--disable-background-timer-throttling")
-        options.add_argument("--disable-backgrounding-occluded-windows")
-        options.add_argument("--disable-translate")
-        options.add_argument("--disable-notifications")
-        options.add_argument("--disable-infobars")
-        options.add_argument("--disable-logging");
-        options.add_argument("--log-level=0");
-        options.add_argument("--output=/dev/null");
+        #options.add_experimental_option(
+        #    "prefs",
+        #    {
+        #        "credentials_enable_service": False,
+        #        "download.default_directory": "/app",
+        #        "profile.default_content_settings.popups": 1,
+        #        "profile.password_manager_enabled": False,
+        #        "download.prompt_for_download": False,
+        #        "download.directory_upgrade": True,
+        #        "extensions_to_open": ",".join(
+        #            ["text/csv", "application/json"]
+        #        ),
+        #        "safebrowsing.enabled": False,
+        #    },
+        #)
+        #options.add_argument("--disable-blink-features=AutomationControlled")
+        #options.add_argument("--disable-extensions")
+        #options.add_argument("--disable-popup-blocking")
+        #options.add_argument("--disable-background-timer-throttling")
+        #options.add_argument("--disable-backgrounding-occluded-windows")
+        #options.add_argument("--disable-translate")
+        #options.add_argument("--disable-notifications")
+        #options.add_argument("--disable-infobars")
+        #options.add_argument("--disable-logging");
+        #options.add_argument("--log-level=0");
+        #options.add_argument("--output=/dev/null");
         
-        options.add_experimental_option("useAutomationExtension", False)
-        options.add_experimental_option(
-            "excludeSwitches", ["enable-automation"]
-        )
+        #options.add_experimental_option("useAutomationExtension", False)
+        #options.add_experimental_option(
+        #    "excludeSwitches", ["enable-automation"]
+        #)
 
         # always use headless
         options.add_argument("--headless")
-        options.add_argument("window-size=1280,1024")
+        #options.add_argument("window-size=1280,1024")
 
         # No exception up to here, so ok
         chromium_service_args = ""
@@ -213,8 +213,8 @@ class Grdf:
         else:
             # Now we know the browser works
             self.__browser = browser
-            logging.debug("Browser works: %s", browser)        
-
+            logging.debug("Browser works: %s", browser)
+       
     def get_screenshot(self, basename: str, dump_html: bool = False):
         """
         Get screenshot and save to file in logs_folder
@@ -392,9 +392,7 @@ class Grdf:
        
         # When everything is ok
         self.isConnected = True
-    
-    
-    
+       
     # Return GRDF quality status
     def isOk(self):
         
@@ -619,8 +617,304 @@ class Grdf:
             raise RuntimeError(f"Unable to parse JSON : {e}")
 
         return j            
-            
 
+#######################################################################
+#### Class GRDF
+#######################################################################
+class Grdf:
+    site_grdf_url = "https://monespace.grdf.fr/client/particulier/consommation"
+    # Constructor
+    def __init__(self):
+
+        # Initialize instance variables
+        self.session = None
+        self.auth_nonce = None
+        self.pceList = []
+        self.whoiam = None
+        self.isConnected = False
+        self.account = None   
+        self.session = requests.Session()
+        logging.debug("After init")
+
+    def login(self,username,password):
+        SESSION_TOKEN_URL = "https://connexion.grdf.fr/api/v1/authn"
+        SESSION_TOKEN_PAYLOAD = """{{
+            "username": "{0}",
+            "password": "{1}",
+            "options": {{
+                "multiOptionalFactorEnroll": "false",
+                "warnBeforePasswordExpired": "false"
+            }}
+        }}"""
+
+        AUTH_TOKEN_URL = "https://connexion.grdf.fr/login/sessionCookieRedirect"
+        AUTH_TOKEN_PARAMS = """{{
+            "checkAccountSetupComplete": "true",
+            "token": "{0}",
+            "redirectUrl": "https://monespace.grdf.fr"
+        }}"""
+
+        self.session = Session()
+        self.session.headers.update({"domain": "grdf.fr"})
+        self.session.headers.update({"Content-Type": "application/json"})
+        self.session.headers.update({"X-Requested-With": "XMLHttpRequest"})
+
+        payload = SESSION_TOKEN_PAYLOAD.format(username, password)
+        logging.debug("payload: %s", payload)
+        response = self.session.post(SESSION_TOKEN_URL, data=payload)
+
+        if response.status_code != 200:
+            raise Exception(f"An error occurred while logging in. Status code: {response.status_code} - {response.text} - {response.payload}")
+            self.isConnected = False
+            return
+
+        # get auth token
+        session_token = response.json().get("sessionToken")
+        logging.debug("Session token: %s", session_token)
+        jar = http.cookiejar.CookieJar()
+        session = Session()
+        session.headers.update({"Content-Type": "application/json"})
+        session.headers.update({"X-Requested-With": "XMLHttpRequest"})
+
+        params = json.loads(AUTH_TOKEN_PARAMS.format(session_token))
+        response = session.get(AUTH_TOKEN_URL, params=params, allow_redirects=True, cookies=jar)
+
+        if response.status_code != 200:
+            raise Exception(f"An error occurred while getting the auth token. Status code: {response.status_code} - {response.text}")
+            self.isConnected = False
+            return
+
+        auth_token = session.cookies.get("auth_token", domain="monespace.grdf.fr")
+        
+        # Create a session.
+        self.session = Session()
+        self.session.headers.update({"Host": "monespace.grdf.fr"})
+        self.session.headers.update({"Domain": "grdf.fr"})
+        self.session.headers.update({"X-Requested-With": "XMLHttpRequest"})
+        self.session.headers.update({"Accept": "application/json"})
+        self.session.cookies.set("auth_token", auth_token, domain="monespace.grdf.fr")
+               
+        # When everything is ok
+        self.isConnected = True
+    
+    # Return GRDF quality status
+    def isOk(self):
+        
+        # GRDF is ok when contains at least one valid PCE
+        if self.countPce() == 0 or self.countPce() is None:
+            return False
+        elif self.countPceOk() == 0 or self.countPceOk() is None:
+            return False
+        else:
+            return True
+        
+        
+    
+    # Get account info
+    def getWhoami(self):
+        
+        logging.debug("Get whoami...")
+        
+        try:
+            req = self.session.get('https://monespace.grdf.fr/api/e-connexion/users/whoami')
+        except Exception as e:
+            logging.error("Error while calling Whoami:")
+            logging.error(str(e))
+            self.isConnected = False
+            return None
+
+        logging.debug("Whoami result %s", req.text)
+        
+        # Check returned JSON format
+        try:
+            account = json.loads(req.text)
+        except Exception as e:
+            logging.error("Whoami returned invalid JSON:")
+            logging.error(str(e))
+            logging.info(req.text)
+            self.isConnected = False
+            return None
+        
+        # Check Whoami content
+        if 'code' in account:
+            logging.info(req)
+            logging.info("Whoami unsuccessful. Invalid returned information: %s", req.text)
+            self.isConnected = False
+            return None
+
+        # Check that id is in account
+        if not 'id' in account or account['id'] <= 0:
+            logging.info(req)
+            logging.info("Whoami unsuccessful. Invalid returned information: %s", req.text)
+            self.isConnected = False
+            return None
+        else:
+            # Create account
+            self.account = Account(account)
+            return self.account    
+               
+    # Get list of PCE
+    def getPceList(self):
+        
+        logging.debug("Get PCEs list...")
+        
+        # Get PCEs from website
+        try:
+            req = self.session.get('https://monespace.grdf.fr/api/e-conso/pce')
+        except Exception as e:
+            logging.error("Error while calling pce:")
+            logging.error(str(e))
+            self.isConnected = False
+            
+        logging.debug("Get PCEs list result : %s",req.text)
+        
+        # Check PCEs list
+        try:
+            pceList = json.loads(req.text)
+        except Exception as e:
+            logging.error("PCEs returned invalid JSON:")
+            logging.error(str(e))
+            logging.info(req.text)
+            self.isConnected = False
+            return None
+        
+        if 'code' in pceList:
+            logging.info(req)
+            logging.info("PCEs unsuccessful. Invalid returned information: %s", req.text)
+            self.isConnected = False
+            return None
+        
+        # Ok everything is fine, we can create PCE
+        for item in pceList:
+            # Create PCE
+            myPce = Pce(item)
+            # Add PCE to list
+            self.addPce(myPce)
+    
+    # Add PCE to list
+    def addPce(self, pce):
+        self.pceList.append(pce)
+        
+    # Return the number of PCE
+    def countPce(self):
+        return len(self.pceList)
+    
+    # Return the number of valid PCE
+    def countPceOk(self):
+        i = 0
+        for myPce in self.pceList:
+            if myPce.isOk() == True:
+                i += 1
+        return i
+    
+    # Get measures of a single PCE for a period range
+    def getPceMeasures(self,pce, startDate, endDate, type):
+        
+        # Convert date
+        myStartDate = _convertGrdfDate(startDate)
+        myEndDate = _convertGrdfDate(endDate)
+
+        if type == TYPE_I:
+            req = self.session.get('https://monespace.grdf.fr/api/e-conso/pce/consommation/informatives?dateDebut=' + myStartDate + '&dateFin=' + myEndDate + '&pceList%5B%5D=' + pce.pceId)
+        elif type == TYPE_P:
+            req = self.session.get('https://monespace.grdf.fr/api/e-conso/pce/consommation/publiees?dateDebut=' + myStartDate + '&dateFin=' + myEndDate + '&pceList%5B%5D=' + pce.pceId)
+        else:
+            logging.error("Type of measures must be informative or published.")
+            exit()
+
+
+        measureList = json.loads(req.text)
+        
+        # Update PCE range of date
+        #pce.dailyMeasureStart = startDate
+        #pce.dailyMeasureEnd = endDate
+        
+        if measureList:
+
+            for measure in measureList[pce.pceId]["releves"]:
+
+                # Create the measure
+                myMeasure = Measure(pce,measure,type)
+
+                # Append measure to the PCE's measure list
+                pce.addMeasure(myMeasure)
+
+        else:
+            logging.error("Measure list provided by GRDF is empty")
+
+
+
+    # Get thresold
+    def getPceThresold(self,pce):
+        
+        req = self.session.get('https://monespace.grdf.fr/api/e-conso/pce/'+ pce.pceId + '/seuils?frequence=Mensuel')
+        thresoldList = json.loads(req.text)
+        
+        for thresold in thresoldList["seuils"]:
+            
+            # Create the thresold
+            myThresold = Thresold(pce,thresold)
+            
+            # Append thresold to the PCE's thresold list
+            pce.addThresold(myThresold)
+    
+    # for posting to url / websocket
+    def open_url(self, host, uri, token, data=None):
+        """
+        GET or POST (if data) request from Home Assistant API.
+        """
+        # Generate URL
+        api_url = host + uri
+
+        headers = {
+            "Authorization": "Bearer {}".format(
+                token
+            ),
+            "Content-Type": "application/json",
+        }
+        logging.debug("GET/POST for URL %s, with headers: %s", api_url, headers)
+        try:
+            if data is None:
+                response = requests.get(
+                    api_url,
+                    headers=headers,
+                    verify=not False,
+                    timeout=30,
+                )
+
+            else:
+                response = requests.post(
+                    api_url,
+                    headers=headers,
+                    json=data,
+                    verify=not False,
+                    timeout=30,
+                )
+                logging.debug(f"URL POST response: {response}")
+        except Exception as e:
+            # HANDLE CONNECTIVITY ERROR
+            raise RuntimeError(f"url={api_url} : {e}")
+
+        # HANDLE SERVER ERROR CODE
+        if response.status_code not in (200, 201):
+            raise RuntimeError(
+                "url=%s - (code = %u)\ncontent=%r)"
+                % (
+                    api_url,
+                    response.status_code,
+                    response.content,
+                )
+            )
+
+        try:
+            j = json.loads(response.content.decode("utf-8"))
+        except Exception as e:
+            # Handle JSON ERROR
+            raise RuntimeError(f"Unable to parse JSON : {e}")
+
+        return j            
+            
+            
 #######################################################################
 #### Class Account
 #######################################################################
