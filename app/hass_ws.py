@@ -20,9 +20,7 @@ class HomeAssistantWs:
         self.id = 1
         self.current_stats = []
         if self.load_config():
-            if self.connect() and self.action == "import":
-                                  
-                                   
+            if self.connect() and self.action == "import":      
                 self.import_data()
             elif self.connect() and self.action == "delete":
                 self.list_data()
@@ -30,8 +28,10 @@ class HomeAssistantWs:
                 self.clear_data()
             else:
                 logging.critical("The configuration of the Websocket Home Assistant WebSocket is erroneous")
+                return False
         else:
-            logging.critical("The configuration of the Websocket Home Assistant WebSocket is erroneous")
+            logging.critical("The configuration of the Websocket Home Assistant WebSocket is erroneous !")
+            return False
         if self.ws.connected:
             self.ws.close()
 
@@ -62,7 +62,7 @@ class HomeAssistantWs:
             return True
         except Exception as e:
             self.ws.close()
-            logging.error(e)
+            logging.error("Error raised: %s", e)
             logging.critical("Connection to Websocket Home Assistant failed")
             logging.warning(
                 f" => WARNING, the WebSocket will be banned after multiple unsuccesful login attempts."
