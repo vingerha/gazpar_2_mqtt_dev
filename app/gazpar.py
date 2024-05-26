@@ -10,20 +10,6 @@ import time
 from requests import Session
 import http.cookiejar
 
-### for use with chromium
-global JAVAVXS
-import selenium
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.remote.remote_connection import LOGGER, logging
-LOGGER.setLevel(logging.WARNING)
-### end for use with chromium
-
-
 # Constants
 GRDF_DATE_FORMAT = "%Y-%m-%d"
 GRDF_DATETIME_FORMAT = "%Y-%m-%d %H:%M:%S"
@@ -64,559 +50,6 @@ def _getRetryTimeSleep(tryNo):
     
     # The time to sleep is exponential 
     return GRDF_API_WAIT_BTW_RETRIES * pow(tryNo,2.5)
-
-#######################################################################
-#### Class GRDF with chromium, keeping in place in case captcha returns
-#######################################################################
-class Grdf_Chromium:
-    site_grdf_url = "https://monespace.grdf.fr/client/particulier/consommation"
-    # Constructor
-    def __init__(self):
-
-        # Initialize instance variables
-        self.session = None
-        self.auth_nonce = None
-        self.pceList = []
-        self.whoiam = None
-        self.isConnected = False
-        self.account = None
-        self.__display = None
-        self.__browser = None
-        self.__wait = None         
-        
-        self.session = requests.Session()
-        
-        self.session.headers = {
-            'User-Agent': 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Mobile Safari/537.36',
-            'Accept-Encoding':'gzip, deflate, br',
-            'Accept':'application/json, */*',
-            'Connection': 'keep-alive'
-        }  
-
-    def init(self):
-        self.init_chromium()
-        logging.debug("Chromium init done")
-        return
-
-    def init_chromium(self):
-        options = webdriver.ChromeOptions()
-        # Set Chrome options
-        if (
-            sys.platform != "win32"
-            and hasattr(os, "geteuid")
-            and os.geteuid() == 0  # pylint: disable=no-member
-        ):
-            logging.debug("Add nix root user options.")
-            options.add_argument("--no-sandbox")
-            options.add_argument("--disable-modal-animations")
-            options.add_argument("--disable-login-animations")
-            options.add_argument("--disable-renderer-backgrounding")
-            options.add_argument("--disable-dev-shm-usage")
-
-        # pylint: disable=condition-evals-to-constant
-        datadir = os.path.expanduser(f"{self.location}/config/google-chrome")
-        os.makedirs(datadir, exist_ok=True)
-        options.add_argument(f"--user-data-dir={datadir}")
-        logging.debug(f"Use {datadir} for Google Chrome user data.")
-        #options.add_argument("--mute-audio")
-        # if self._use_display:
-        #     Does not work well with veolia due to multiple "same" elements
-        #     options.add_argument("--auto-open-devtools-for-tabs")
-        #options.add_experimental_option(
-        #    "prefs",
-        #    {
-        #        "credentials_enable_service": False,
-        #        "download.default_directory": "/app",
-        #        "profile.default_content_settings.popups": 1,
-        #        "profile.password_manager_enabled": False,
-        #        "download.prompt_for_download": False,
-        #        "download.directory_upgrade": True,
-        #        "extensions_to_open": ",".join(
-        #            ["text/csv", "application/json"]
-        #        ),
-        #        "safebrowsing.enabled": False,
-        #    },
-        #)
-        #options.add_argument("--disable-blink-features=AutomationControlled")
-        #options.add_argument("--disable-extensions")
-        #options.add_argument("--disable-popup-blocking")
-        #options.add_argument("--disable-background-timer-throttling")
-        #options.add_argument("--disable-backgrounding-occluded-windows")
-        #options.add_argument("--disable-translate")
-        #options.add_argument("--disable-notifications")
-        #options.add_argument("--disable-infobars")
-        #options.add_argument("--disable-logging");
-        #options.add_argument("--log-level=0");
-        #options.add_argument("--output=/dev/null");
-        
-        #options.add_experimental_option("useAutomationExtension", False)
-        #options.add_experimental_option(
-        #    "excludeSwitches", ["enable-automation"]
-        #)
-
-        # always use headless
-        options.add_argument("--headless")
-        #options.add_argument("window-size=1280,1024")
-
-        # No exception up to here, so ok
-        chromium_service_args = ""
-        LOGGER.setLevel(logging.WARNING)
-        if self._verbose:
-            logging.debug("Verbose output: %s", self._verbose)
-            chromium_service_args = (
-                ["--verbose"] 
-            )
-            options.add_argument("--enable-logging")
-            options.add_argument("--log-level=1")
-            options.add_argument("--v=1")
-            LOGGER.setLevel(logging.DEBUG)
-        
-            
-        chromedriver_log = os.path.join(
-            self.location,
-            "chromedriver.log",
-        )
-        
-        logging.debug(
-            f" Chromedriver log {chromedriver_log}, service args: {chromium_service_args}"
-        )
-        logging.debug("Start the browser")
-
-        try:
-            if "chromium" in inspect.getmembers(webdriver): 
-                chromeService = webdriver.chromium.service.ChromiumService(
-                    executable_path="/usr/local/lib/python3.11/site-packages/chromedriver",
-                    service_args=chromium_service_args,  # More debug info
-                    log_output=chromedriver_log
-                )
-            else:
-                logging.debug("chromium NOT found in inspect")
-                chromeService = webdriver.chrome.service.Service(
-                    service_args=chromium_service_args,  # More debug info
-                    log_output=chromedriver_log
-                )
-            logging.debug("init_chromium 5 chromes: %s", chromeService)
-            logging.debug("init_chromium 5 options: %s", options)
-
-            browser = webdriver.Chrome(
-                service=chromeService,
-                options=options,
-            )
-            timeout = 5 # type:ignore
-            self.__wait = WebDriverWait(browser, timeout)
-        except AttributeError:
-            logging.debug("chromium unknown in selenium webdriver")
-            raise
-        except Exception as e:
-            logging.debug("Exception in trying to start chromium browser: %s", e)
-            raise
-        else:
-            # Now we know the browser works
-            self.__browser = browser
-            logging.debug("Browser works: %s", browser)
-       
-    def get_screenshot(self, basename: str, dump_html: bool = False):
-        """
-        Get screenshot and save to file in logs_folder
-        """
-        fn_img = os.path.join(self.location, basename)
-        # Screenshots are only for debug, so errors are not blocking.
-        try:
-            logging.debug(f"Grab screenshot and Save: {fn_img}")
-            # img = self.__display.waitgrab()
-            self.__browser.get_screenshot_as_file(fn_img)
-        except Exception as e:
-            logging.debug(
-                f"Exception while getting screenshot {fn_img}: {e}"
-            )
-
-        if dump_html:
-            try:
-                fn_html = fn_img + ".html"
-                with open(fn_html, "w", encoding="utf_8") as html_file:
-                    logging.debug(f"Writing screenshot to htm: '{fn_html}'. ")
-                    html_file.write(self.__browser.page_source)
-            except Exception as e:
-                logging.debug(f"Could not dump html {fn_html}: {e}")
-                
-    # Login
-    def login(self,username,password, download_folder, screenshot: bool = False, verbose: bool = False):
-        HEADERS = {
-            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/111.0",
-            "Accept": "application/json, text/plain, */*",
-            "Accept-Language": "ru-RU,ru;q=0.8,en-US;q=0.5,en;q=0.3",
-        }    
-        #site_grdf_url = "https://monespace.grdf.fr/client/particulier/consommation"
-        site_grdf_url = "https://monespace.grdf.fr/client/particulier/accueil"
-   
-        self.location = download_folder #was: os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
-        self._verbose = verbose
-        self.init()
-        isLoggedIn = False
-        logging.debug("Get url")
-        self.__browser.get(site_grdf_url)
-
-        if screenshot:
-            self.get_screenshot("00_screenshot_entry.png") 
-
-        deny_btn = None
-        try:
-            deny_btn = self.__browser.find_element(
-                By.ID, "btn_option_deny_banner"
-            )
-        except Exception:
-            pass
-
-        if deny_btn is not None:
-            logging.debug("Clicking on Deny button") 
-            self.click_in_view(
-                By.ID,
-                "btn_option_deny_banner",
-                wait_message="Waiting for cookie popup",
-                click_message="Click on deny",
-                delay=0,  # random.uniform(1, 2),
-            )
-
-        
-        # Wait for Connexion #####
-        logging.debug("Connection with site GRDF")
-
-
-        if screenshot:
-            self.get_screenshot("01_screenshot_before_user.png")        
-
-        # Wait for Email #####
-        logging.debug("Waiting for Email")
-        ep = EC.presence_of_element_located((By.ID, "input27"))
-        el_email = self.__wait.until(
-            ep,
-            message="failed, page timeout (timeout=30)",
-        )
-        logging.debug("OK")
-        
-        # Type Email #####
-        logging.debug("Enter Email")
-        el_email.clear()
-        el_email.send_keys(username)
-       
-        if screenshot:
-            self.get_screenshot("02_screenshot_after_user.png")          
- 
-        re_btn = self.__browser.find_element(
-            By.ID, "grdfButton"
-        )
-        logging.debug("Using Button 1: %s", re_btn)
-        re_btn.click()            
-        time.sleep(2)
-        
-        if screenshot:
-            self.get_screenshot("03_screenshot_after_button.png")
-
- 
-        # Wait for Password #####
-        logging.debug("Waiting for Password")
-        ep = EC.element_to_be_clickable((By.NAME,"credentials.passcode"))
-        el_password = self.__wait.until(
-            ep,
-            message="failed, page timeout (timeout=30)",
-        )
-
-        # Type Password #####
-        logging.debug("Enter Password")
-        el_password.send_keys(password)
-        time.sleep(2)
-        
-        if screenshot:
-            self.get_screenshot("04a_screenshot_enter_password.png")
-        
-        re_btn = self.__browser.find_element(
-            By.CLASS_NAME, "eyeicon.visibility-16.button-show"
-        )
-        logging.debug("Using show password: %s", re_btn)
-        re_btn.click()              
-        time.sleep(2)
-        
-        if screenshot:
-            self.get_screenshot("04c_screenshot_after_show_password_button.png")
-        
-        re_btn = self.__browser.find_element(
-            By.ID, "grdfButton"
-        )
-        logging.debug("Using Button 2: %s", re_btn)
-        re_btn.click()   
-        time.sleep(3)   
-        
-        if screenshot:
-            self.get_screenshot("04c_screenshot_after_password_button.png")
-
-        self.__browser.switch_to.default_content()
-        time.sleep(3)
-        
-        if screenshot:
-            self.get_screenshot("05_screenshot_after_switch_to_default_content.png")
-            
-        isLoggedIn = True
-
-        if isLoggedIn:
-            # Check if there is a Cookies Consent popup deny button #####
-            deny_btn = None
-            try:
-                deny_btn = self.__browser.find_element(
-                    By.ID, "btn_option_deny_banner"
-                ).click()
-            except Exception:
-                pass
-            logging.debug("Using deny_btn: %s", deny_btn)
-
-            if screenshot:
-                self.get_screenshot("06_screenshot_after_deny_button.png")                    
-                
-            try:
-                self.click_in_view(
-                    By.XPATH,
-                    CONNEXION_XPATH,
-                    # wait_message="",
-                    click_message="Click on connexion",
-                    delay=random.uniform(1, 2),
-                    timeout=2,
-                )
-                #time.sleep(5)
-                logging.debug("End of wait after connexion. ")
-            except Exception:
-                # Already clicked or other error
-                pass
-        
-        if screenshot:
-            self.get_screenshot("07_screenshot_after_connexion_path.png")    
-
-       
-        # When everything is ok
-        self.isConnected = True
-       
-    # Return GRDF quality status
-    def isOk(self):
-        
-        # GRDF is ok when contains at least one valid PCE
-        if self.countPce() == 0 or self.countPce() is None:
-            return False
-        elif self.countPceOk() == 0 or self.countPceOk() is None:
-            return False
-        else:
-            return True
-        
-    
-    # Get account info
-    def getWhoami(self):
-        
-        logging.info("Get whoami...")
-        self.__browser.get('https://monespace.grdf.fr/api/e-connexion/users/whoami')
-              
-        try:
-            content = self.__browser.find_element(By.TAG_NAME, "pre").text
-            resp = json.loads(content)
-        except selenium.common.exceptions.NoSuchElementException:
-            logging.error("ERROR geting Whoami")
-            time.sleep(5)
-        
-
-        logging.debug("Whoami result %s", resp)
-        
-        # Check returned JSON format
-        try:
-            account = resp
-        except Exception as e:
-            logging.error("Whoami returned invalid JSON:")
-            logging.error(str(e))
-            self.isConnected = False
-            return None
-        
-        # Check Whoami content
-        if 'code' in account:
-            logging.info("Whoami unsuccessful. Invalid returned information: %s", resp)
-            self.isConnected = False
-            return None
-
-        # Check that id is in account
-        if not 'id' in account or account['id'] <= 0:
-            logging.info("Whoami unsuccessful. Invalid returned information: %s", resp)
-            self.isConnected = False
-            return None
-        else:
-            # Create account
-            self.account = Account(account)
-            return self.account    
-               
-    # Get list of PCE
-    def getPceList(self):
-        
-        logging.debug("Get PCEs list...")
-        
-        # Get PCEs from website
-        self.__browser.get('https://monespace.grdf.fr/api/e-conso/pce')
-
-        try:
-            content = self.__browser.find_element(By.TAG_NAME, "pre").text
-            resp = json.loads(content)
-        except selenium.common.exceptions.NoSuchElementException:
-            logging.info("ERROR in getting PCE")
-            time.sleep(5)
-            
-        logging.debug("Get PCEs list result : %s",resp)
-        
-        # Check PCEs list
-        try:
-            pceList = resp
-        except Exception as e:
-            logging.error("PCEs returned invalid JSON:")
-            logging.error(str(e))
-            self.isConnected = False
-            return None
-        
-        if 'code' in pceList:
-            logging.info("PCEs unsuccessful. Invalid returned information: %s", resp)
-            self.isConnected = False
-            return None
-        
-        # Ok everything is fine, we can create PCE
-        for item in pceList:
-            # Create PCE
-            myPce = Pce(item)
-            # Add PCE to list
-            self.addPce(myPce)
-    
-    # Add PCE to list
-    def addPce(self, pce):
-        self.pceList.append(pce)
-        
-    # Return the number of PCE
-    def countPce(self):
-        return len(self.pceList)
-    
-    # Return the number of valid PCE
-    def countPceOk(self):
-        i = 0
-        for myPce in self.pceList:
-            if myPce.isOk() == True:
-                i += 1
-        return i
-    
-    # Get measures of a single PCE for a period range
-    def getPceMeasures(self,pce, startDate, endDate, type):
-        
-        # Convert date
-        myStartDate = _convertGrdfDate(startDate)
-        myEndDate = _convertGrdfDate(endDate)
-
-        if type == TYPE_I:
-            self.__browser.get('https://monespace.grdf.fr/api/e-conso/pce/consommation/informatives?dateDebut=' + myStartDate + '&dateFin=' + myEndDate + '&pceList%5B%5D=' + pce.pceId)
-        elif type == TYPE_P:
-            self.__browser.get('https://monespace.grdf.fr/api/e-conso/pce/consommation/publiees?dateDebut=' + myStartDate + '&dateFin=' + myEndDate + '&pceList%5B%5D=' + pce.pceId)
-        else:
-            logging.error("Type of measures must be informative or published.")
-            exit()
-
-        try:
-            content = self.__browser.find_element(By.TAG_NAME, "pre").text
-            resp = json.loads(content)
-        except selenium.common.exceptions.NoSuchElementException:
-            logging.debug("ERROR in getting Measures")
-            time.sleep(5)
-            
-        measureList = resp
-               
-        if measureList:
-
-            for measure in measureList[pce.pceId]["releves"]:
-
-                # Create the measure
-                myMeasure = Measure(pce,measure,type)
-
-                # Append measure to the PCE's measure list
-                pce.addMeasure(myMeasure)
-
-        else:
-            logging.error("Measure list provided by GRDF is empty")
-
-
-
-    # Get threshold
-    def getPceThreshold(self,pce):
-        
-        self.__browser.get('https://monespace.grdf.fr/api/e-conso/pce/'+ pce.pceId + '/seuils?frequence=Mensuel')
-        try:
-            content = self.__browser.find_element(By.TAG_NAME, "pre").text
-            resp = json.loads(content)
-        except selenium.common.exceptions.NoSuchElementException:
-            logging.debug("ERROR in getting Threshold")
-            time.sleep(5)        
-        thresholdList = resp
-        
-        if thresholdList:
-            for threshold in thresholdList["seuils"]:
-                
-                # Create the threshold
-                myThreshold = Threshold(pce,threshold)
-                
-                # Append threshold to the PCE's threshold list
-                pce.addThreshold(myThreshold)
-        else:
-            logging.debug("Error in getting thresholds from GRDF")
-
-            
-    def open_url(self, host, uri, token, data=None):
-        """
-        GET or POST (if data) request from Home Assistant API.
-        """
-        # Generate URL
-        api_url = host + uri
-
-        headers = {
-            "Authorization": "Bearer {}".format(
-                token
-            ),
-            "Content-Type": "application/json",
-        }
-        logging.debug("GET/POST for URL %s, with headers: %s", api_url, headers)
-        try:
-            if data is None:
-                response = requests.get(
-                    api_url,
-                    headers=headers,
-                    verify=not False,
-                    timeout=30,
-                )
-
-            else:
-                response = requests.post(
-                    api_url,
-                    headers=headers,
-                    json=data,
-                    verify=not False,
-                    timeout=30,
-                )
-                logging.debug(f"URL POST response: {response}")
-        except Exception as e:
-            # HANDLE CONNECTIVITY ERROR
-            raise RuntimeError(f"url={api_url} : {e}")
-
-        # HANDLE SERVER ERROR CODE
-        if response.status_code not in (200, 201):
-            raise RuntimeError(
-                "url=%s - (code = %u)\ncontent=%r)"
-                % (
-                    api_url,
-                    response.status_code,
-                    response.content,
-                )
-            )
-
-        try:
-            j = json.loads(response.content.decode("utf-8"))
-        except Exception as e:
-            # Handle JSON ERROR
-            raise RuntimeError(f"Unable to parse JSON : {e}")
-
-        return j            
 
 #######################################################################
 #### Class GRDF
@@ -1152,6 +585,40 @@ class Pce:
             self.gasD7 = self._getDeltaCons(db,startStr,endStr,type)
             logging.debug("D-7 gas : %s m3",self.gasD7)
             
+            ## Calculate D1 gas gross
+            dateStr = f"'{dateNow}','-1 day'"
+            self.gasGrossD1 = self._getGrossCons(db,dateStr,type)
+            logging.debug("D-1 gasGross : %s m3",self.gasGrossD1)
+            
+            ## Calculate D2 gas gross
+            dateStr = f"'{dateNow}','-2 day'"
+            self.gasGrossD2 = self._getGrossCons(db,dateStr,type)
+            logging.debug("D-2 gasGross : %s m3",self.gasGrossD2)            
+
+            ## Calculate D3 gas gross
+            dateStr = f"'{dateNow}','-3 day'"
+            self.gasGrossD3 = self._getGrossCons(db,dateStr,type)
+            logging.debug("D-3 gasGross : %s m3",self.gasGrossD3)
+
+            ## Calculate D4 gas gross
+            dateStr = f"'{dateNow}','-4 day'"
+            self.gasGrossD4 = self._getGrossCons(db,dateStr,type)
+            logging.debug("D-4 gasGross : %s m3",self.gasGrossD4)              
+            
+            ## Calculate D5 gas gross
+            dateStr = f"'{dateNow}','-5 day'"
+            self.gasGrossD5 = self._getGrossCons(db,dateStr,type)
+            logging.debug("D-5 gasGross : %s m3",self.gasGrossD5)
+
+            ## Calculate D6 gas gross
+            dateStr = f"'{dateNow}','-6 day'"
+            self.gasGrossD6 = self._getGrossCons(db,dateStr,type)
+            logging.debug("D-6 gasGross : %s m3",self.gasGrossD6)
+
+            ## Calculate D7 gas gross
+            dateStr = f"'{dateNow}','-7 day'"
+            self.gasGrossD7 = self._getGrossCons(db,dateStr,type)
+            logging.debug("D-7 gasGross : %s m3",self.gasGrossD7)              
             
             # Rolling measures
             
@@ -1290,6 +757,25 @@ class Pce:
         else:
             logging.debug("Delta conso could not be calculated")
             return 0
+            
+    def _getGrossCons(self,db,cDate,type):
+        
+        logging.debug("Retrieve gross conso for: %s",cDate)
+        
+        # We need to have at least 2 records to measure a delta index
+        query = f"SELECT volumeGrossConsumed FROM measures WHERE pce = '{self.pceId}' AND type = '{type}' AND date = date({cDate}) GROUP BY pce"
+        db.cur.execute(query)
+        queryResult = db.cur.fetchone()
+        if queryResult is not None:
+            valueResult = queryResult[0]
+            if valueResult >= 0:
+                return valueResult
+            else:
+                logging.debug("Gross conso value is not valid : %s",valueResult)
+                return 0
+        else:
+            logging.debug("Gross conso could not be calculated")
+            return 0            
     
     # Return the conversion factor max between 2 measures 
     def _getConversion(self,db,startStr,endStr,type):

@@ -20,7 +20,7 @@ from hass_ws import HomeAssistantWs
 
 
 # gazpar2mqtt constants
-G2M_VERSION = '0.8.4.2'
+G2M_VERSION = '0.8.6'
 G2M_DB_VERSION = '0.4.0'
 G2M_INFLUXDB_VERSION = '0.1.0'
 
@@ -60,11 +60,11 @@ def run(myParams):
     # STEP 1 : Connect to database
     ####################################################################################################################
     logging.info("-----------------------------------------------------------")
-    logging.info("#        Connexion to SQLite database                     #")
+    logging.info("#        Connection to SQLite database                     #")
     logging.info("-----------------------------------------------------------")
 
     # Create/Update database
-    logging.info("Connexion to SQLite database...")
+    logging.info("Connection to SQLite database...")
     myDb = database.Database(myParams.dbPath)
 
 
@@ -117,7 +117,7 @@ def run(myParams):
     # STEP 2 : Log to MQTT broker
     ####################################################################################################################
     logging.info("-----------------------------------------------------------")
-    logging.info("#              Connexion to Mqtt broker                   #")
+    logging.info("#              Connection to Mqtt broker                   #")
     logging.info("-----------------------------------------------------------")
 
     try:
@@ -130,7 +130,7 @@ def run(myParams):
         # Connect mqtt broker
         myMqtt.connect(myParams.mqttHost,myParams.mqttPort)
 
-        # Wait for connexion callback
+        # Wait for connection callback
         time.sleep(2)
 
         if myMqtt.isConnected:
@@ -148,14 +148,14 @@ def run(myParams):
         logging.info("-----------------------------------------------------------")
 
         tryCount = 0
-        # Connexion
+        # Connection
         while tryCount < gazpar.GRDF_API_MAX_RETRIES :
             try:
 
                 tryCount += 1
 
                 # Create Grdf instance
-                logging.debug("Connexion to GRDF, try %s/%s...",tryCount,gazpar.GRDF_API_MAX_RETRIES)
+                logging.debug("Connection to GRDF, try %s/%s...",tryCount,gazpar.GRDF_API_MAX_RETRIES)
                 myGrdf = gazpar.Grdf()
                 logging.debug("After myGrdf")
                 # Connect to Grdf website
@@ -163,7 +163,7 @@ def run(myParams):
                 myGrdf.login(myParams.grdfUsername,myParams.grdfPassword)
 
 
-                # Check connexion
+                # Check connection
                 if myGrdf.isConnected:
                     logging.info("GRDF connected !")
                     break
@@ -331,7 +331,7 @@ def run(myParams):
                         logging.info("%s thresholds found !",thresholdCount)
 
                     except:
-                        logging.error("Error to get PCE's thresholds from GRDF")
+                        logging.warning("Error to get PCE's thresholds, verify if you have setup thresholds for your PCE/account")
 
                     # Update database
                     if myPce.thresholdList:
@@ -359,20 +359,7 @@ def run(myParams):
 
                                                                                                                                                                                                                      
                      
-    ####################################################################################################################
-
-                                                                               
-                                                                                
-                                                                               
-
-                                
-                                                                                                    
-                                                                                                   
-                                
-                                                                               
-
-
-                                                                                                                                                                                                                     
+    ####################################################################################################################     
     # STEP 5A : Standalone mode
     ####################################################################################################################
     if myMqtt.isConnected \
@@ -567,7 +554,7 @@ def run(myParams):
                         myEntity = hass.Entity(myDevice, hass.SENSOR, 'index', 'index', hass.GAS_TYPE, hass.ST_TTI,
                                                'm³').setValue(myMeasure.endIndex)
                         myEntity = hass.Entity(myDevice, hass.SENSOR, 'conversion_factor', 'conversion factor',
-                                               hass.GAS_TYPE, None, 'm³').setValue(myMeasure.conversionFactor)
+                                               None, None, 'kWh/m³').setValue(myMeasure.conversionFactor)
                         myEntity = hass.Entity(myDevice, hass.SENSOR, 'gas', 'gas', hass.GAS_TYPE, hass.ST_TT,
                                                'm³').setValue(myMeasure.volume)
                         myEntity = hass.Entity(myDevice, hass.SENSOR, 'energy', 'energy', hass.ENERGY_TYPE, hass.ST_TT,
@@ -584,7 +571,7 @@ def run(myParams):
                         myEntity = hass.Entity(myDevice, hass.SENSOR, 'published_index', 'published index', hass.GAS_TYPE, hass.ST_TTI,
                                                'm³').setValue(myMeasure.endIndex)
                         myEntity = hass.Entity(myDevice, hass.SENSOR, 'published_conversion_factor', 'published conversion factor',
-                                               hass.GAS_TYPE, None, 'm³').setValue(myMeasure.conversionFactor)
+                                               None, None, 'kWh/m³').setValue(myMeasure.conversionFactor)
                         myEntity = hass.Entity(myDevice, hass.SENSOR, 'published_gas', 'published gas', hass.GAS_TYPE, hass.ST_TT,
                                                'm³').setValue(myMeasure.volume)
                         myEntity = hass.Entity(myDevice, hass.SENSOR, 'published_energy', 'published energy', hass.ENERGY_TYPE, hass.ST_TT,
@@ -623,6 +610,16 @@ def run(myParams):
                     myEntity = hass.Entity(myDevice,hass.SENSOR,'day_5_gas','day-5 gas',hass.GAS_TYPE,hass.ST_TT,'m³').setValue(myPce.gasD5)
                     myEntity = hass.Entity(myDevice,hass.SENSOR,'day_6_gas','day-6 gas',hass.GAS_TYPE,hass.ST_TT,'m³').setValue(myPce.gasD6)
                     myEntity = hass.Entity(myDevice,hass.SENSOR,'day_7_gas','day-7 gas',hass.GAS_TYPE,hass.ST_TT,'m³').setValue(myPce.gasD7)
+                    
+                    ### Day Gross
+                    myEntity = hass.Entity(myDevice,hass.SENSOR,'day_1_gas_gross','day-1 gas gross',hass.GAS_TYPE,hass.ST_TT,'m³').setValue(myPce.gasGrossD1)
+                    myEntity = hass.Entity(myDevice,hass.SENSOR,'day_2_gas_gross','day-2 gas gross',hass.GAS_TYPE,hass.ST_TT,'m³').setValue(myPce.gasGrossD2)
+                    myEntity = hass.Entity(myDevice,hass.SENSOR,'day_3_gas_gross','day-3 gas gross',hass.GAS_TYPE,hass.ST_TT,'m³').setValue(myPce.gasGrossD3)
+                    myEntity = hass.Entity(myDevice,hass.SENSOR,'day_4_gas_gross','day-4 gas gross',hass.GAS_TYPE,hass.ST_TT,'m³').setValue(myPce.gasGrossD4)
+                    myEntity = hass.Entity(myDevice,hass.SENSOR,'day_5_gas_gross','day-5 gas gross',hass.GAS_TYPE,hass.ST_TT,'m³').setValue(myPce.gasGrossD5)
+                    myEntity = hass.Entity(myDevice,hass.SENSOR,'day_6_gas_gross','day-6 gas gross',hass.GAS_TYPE,hass.ST_TT,'m³').setValue(myPce.gasGrossD6)
+                    myEntity = hass.Entity(myDevice,hass.SENSOR,'day_7_gas_gross','day-7 gas gross',hass.GAS_TYPE,hass.ST_TT,'m³').setValue(myPce.gasGrossD7)
+
 
                     ## Calculated rolling measures
                     logging.debug("Creation of rolling entities")
@@ -657,18 +654,18 @@ def run(myParams):
                     
                     if myParams.hassLts:
                         logging.debug("Creation of dummy LTS sensors")                        
-                        myEntity = hass.Entity(myDevice, hass.SENSOR, 'consumption_stat', 'consumption stat', hass.GAS_TYPE, hass.ST_TT,
-                                               'm³').setValue('1')
-                        myEntity = hass.Entity(myDevice, hass.SENSOR, 'consumption_kwh_stat', 'consumption kwh stat', hass.GAS_TYPE, hass.ST_TT,
-                                               'kWh').setValue('1')                                               
-                        myEntity = hass.Entity(myDevice, hass.SENSOR, 'consumption_pub_stat', 'consumption pub stat', hass.GAS_TYPE, hass.ST_TT,
-                                               'm³').setValue('1')
-                        myEntity = hass.Entity(myDevice, hass.SENSOR, 'consumption_kwh_pub_stat', 'consumption kwh pub stat', hass.GAS_TYPE, hass.ST_TT,
-                                               'kWh').setValue('1')                                               
-                        myEntity = hass.Entity(myDevice, hass.SENSOR, 'consumption_cost_stat', 'consumption cost stat', hass.COST_TYPE, hass.ST_TT,
-                                               'EUR').setValue('1')
-                        myEntity = hass.Entity(myDevice, hass.SENSOR, 'consumption_cost_pub_stat', 'consumption cost pub stat', hass.COST_TYPE, hass.ST_TT,
-                                               'EUR').setValue('1')                                               
+                        myEntity = hass.Entity(myDevice, hass.SENSOR, 'consumption_stat', 'consumption stat', hass.GAS_TYPE, hass.ST_MEAS,
+                                               'm³').setValue('0')
+                        myEntity = hass.Entity(myDevice, hass.SENSOR, 'consumption_kwh_stat', 'consumption kwh stat', hass.ENERGY_TYPE, hass.ST_MEAS,
+                                               'kWh').setValue('0')                                               
+                        myEntity = hass.Entity(myDevice, hass.SENSOR, 'consumption_pub_stat', 'consumption pub stat', hass.GAS_TYPE, hass.ST_MEAS,
+                                               'm³').setValue('0')
+                        myEntity = hass.Entity(myDevice, hass.SENSOR, 'consumption_kwh_pub_stat', 'consumption kwh pub stat', hass.ENERGY_TYPE, hass.ST_MEAS,
+                                               'kWh').setValue('0')                                               
+                        myEntity = hass.Entity(myDevice, hass.SENSOR, 'consumption_cost_stat', 'consumption cost stat', hass.COST_TYPE, hass.ST_MEAS,
+                                               'EUR').setValue('0')
+                        myEntity = hass.Entity(myDevice, hass.SENSOR, 'consumption_cost_pub_stat', 'consumption cost pub stat', hass.COST_TYPE, hass.ST_MEAS,
+                                               'EUR').setValue('0')                                               
                                                
                 # Publish config, state (when value not none), attributes (when not none)
                 logging.info("Publishing devices...")
@@ -719,29 +716,18 @@ def run(myParams):
                     # Loop on prices of the PCE and write the current price
                     for myPrice in myPcePrices:
                         #informative / daily values
-                        logging.debug(f"QUERY_I: SELECT pce, type, date, energy, price FROM measures where pce = '{myPce.pceId}' and type = '{gazpar.TYPE_I}' and date between '{myPrice.startDate}' and '{myPrice.endDate}'")
-                        cursor.execute(f"SELECT pce, type, date, energy, price FROM measures where pce = '{myPce.pceId}' and type = '{gazpar.TYPE_I}' and date between '{myPrice.startDate}' and '{myPrice.endDate}'")
-                        
-                        data = cursor.fetchall()
-                        
-                        for x in data:
-                            try: 
-                                cursor.execute(f"UPDATE measures SET price= ( energyGrossConsumed * {myPrice.kwhPrice} ) + {myPrice.fixPrice}") 
-                                myDb.commit()
-                            except Exception as e:
-                                logging.error("Writing Prices error: %s", e)
-                        
+                        query = f"UPDATE measures SET price= ( energyGrossConsumed * {myPrice.kwhPrice} ) + {myPrice.fixPrice} where pce = '{myPce.pceId}' and type = '{gazpar.TYPE_I}' and date between '{myPrice.startDate}' and '{myPrice.endDate}'"
+                        logging.debug("Query_I: %s", query )
+                        cursor.execute(query) 
+                        myDb.commit()
+
                         #published / periodic values
-                        logging.debug(f"QUERY_P: SELECT pce, type, date, energy, price FROM measures where pce = '{myPce.pceId}' and type = '{gazpar.TYPE_P}' and date between '{myPrice.startDate}' and '{myPrice.endDate}'")
-                        cursor.execute(f"SELECT pce, type, date, energy, price FROM measures where pce = '{myPce.pceId}' and type = '{gazpar.TYPE_P}' and date between '{myPrice.startDate}' and '{myPrice.endDate}'")
-                        data = cursor.fetchall()
+                        query = f"UPDATE measures SET price= ( energyGrossConsumed * {myPrice.kwhPrice} ) + ((JulianDay(periodEnd) - JulianDay(periodStart)) * {myPrice.fixPrice}) where pce = '{myPce.pceId}' and type = '{gazpar.TYPE_P}' and date between '{myPrice.startDate}' and '{myPrice.endDate}'"
+                        logging.debug("Query_P: %s", query )
                         
-                        for x in data:
-                            try: 
-                                cursor.execute(f"UPDATE measures SET price= ( energyGrossConsumed * {myPrice.kwhPrice} ) + ((JulianDay(periodEnd) - JulianDay(periodStart)) * {myPrice.fixPrice})") 
-                                myDb.commit()
-                            except Exception as e:
-                                logging.error("Writing Prices from file, error: %s", e)                                               
+                        cursor.execute(query) 
+
+                        myDb.commit()
 
                 else:
                     logging.warning("No prices file found, using the default price (%s €/kWh and %s €/day).", myParams.priceKwhDefault, myParams.priceFixDefault)
@@ -754,7 +740,8 @@ def run(myParams):
                             cursor.execute(f"UPDATE measures SET price= ( energyGrossConsumed * {myParams.priceKwhDefault} ) + {myParams.priceFixDefault}") 
                             myDb.commit()
                         except Exception as e:
-                            logging.error("Writing Prices with default values, error: %s", e)           
+                            logging.error("Writing Prices with default values, error: %s", e)  
+                    
                         
         except Exception as e:
             logging.error("Home Assistant Prices error: %s", e)
@@ -767,7 +754,6 @@ def run(myParams):
         and myGrdf.isConnected \
         and not myParams.hassLtsDelete :
         
-        response_ws = False        
         try: 
             logging.info("-----------------------------------------------------------")
             logging.info("#   Home assistant Long Term Statistics (WebService)      #")
@@ -784,7 +770,6 @@ def run(myParams):
                     "keyfile": myParams.hassSslKeyfile
                     }    
             # Loop on PCEs
-
             for myPce in myDb.pceList:
                 logging.info("Writing webservice information of PCE %s alias %s...", myPce.pceId, myPce.alias)
 
@@ -859,23 +844,19 @@ def run(myParams):
                 sensor_name_cost_pub = 'sensor.' + myParams.hassDeviceName + '_' + myPce.alias.lower().strip().replace(" ", "_") + '_consumption_pub_cost_stat'                
                 
                 logging.debug(f"Writing Websocket Home Assistant LTS for PCE: {myPce.pceId}, sensor name: {sensor_name}")
-                # check once if connection works
-                response_ws = HomeAssistantWs("import", myPce.pceId, myParams.hassHost.split('//')[1], myParams.hassSsl, ssl_data, myParams.hassToken, sensor_name, 'm³', stats_array)
-                if response_ws:
-                    HomeAssistantWs("import", myPce.pceId, myParams.hassHost.split('//')[1], myParams.hassSsl, ssl_data, myParams.hassToken, sensor_name_kwh, 'kWh', stats_array_kwh)
-                    HomeAssistantWs("import", myPce.pceId, myParams.hassHost.split('//')[1], myParams.hassSsl, ssl_data, myParams.hassToken, sensor_name_cost, 'EUR', stats_array_cost)
-                    
-                    logging.debug(f"Writing Websocket Home Assistant Published LTS for PCE: {myPce.pceId}, sensor name: {sensor_name_pub}")
-                    HomeAssistantWs("import", myPce.pceId, myParams.hassHost.split('//')[1], myParams.hassSsl, ssl_data, myParams.hassToken, sensor_name_pub, 'm³', stats_array_pub)
-                    HomeAssistantWs("import", myPce.pceId, myParams.hassHost.split('//')[1], myParams.hassSsl, ssl_data, myParams.hassToken, sensor_name_kwh_pub, 'kWh', stats_array_kwh_pub)
-                    HomeAssistantWs("import", myPce.pceId, myParams.hassHost.split('//')[1], myParams.hassSsl, ssl_data, myParams.hassToken, sensor_name_cost_pub, 'EUR',  stats_array_pub_cost)                
+                HomeAssistantWs("import", myPce.pceId, myParams.hassHost.split('//')[1], myParams.hassSsl, ssl_data, myParams.hassToken, sensor_name, 'm³', stats_array)
+                HomeAssistantWs("import", myPce.pceId, myParams.hassHost.split('//')[1], myParams.hassSsl, ssl_data, myParams.hassToken, sensor_name_kwh, 'kWh', stats_array_kwh)
+                HomeAssistantWs("import", myPce.pceId, myParams.hassHost.split('//')[1], myParams.hassSsl, ssl_data, myParams.hassToken, sensor_name_cost, 'EUR', stats_array_cost)
+                
+                logging.debug(f"Writing Websocket Home Assistant Published LTS for PCE: {myPce.pceId}, sensor name: {sensor_name_pub}")
+                HomeAssistantWs("import", myPce.pceId, myParams.hassHost.split('//')[1], myParams.hassSsl, ssl_data, myParams.hassToken, sensor_name_pub, 'm³', stats_array_pub)
+                HomeAssistantWs("import", myPce.pceId, myParams.hassHost.split('//')[1], myParams.hassSsl, ssl_data, myParams.hassToken, sensor_name_kwh_pub, 'kWh', stats_array_kwh_pub)
+                HomeAssistantWs("import", myPce.pceId, myParams.hassHost.split('//')[1], myParams.hassSsl, ssl_data, myParams.hassToken, sensor_name_cost_pub, 'EUR',  stats_array_pub_cost)                
            
         except Exception as e:
             logging.error("Home Assistant Long Term Statistics : unable to publish LTS to Webservice HA with error: %s", e)
-            response_ws = False
-        
-        if not response_ws:         
-            logging.error("Websocket failed, retrying with API") 
+            logging.error("Retrying with API") 
+                    
             try:
                 logging.info("-----------------------------------------------------------")
                 logging.info("#      Home assistant Long Term Statistics (API)          #")
@@ -984,7 +965,7 @@ def run(myParams):
     if myMqtt.isConnected:
 
         logging.info("-----------------------------------------------------------")
-        logging.info("#               Disconnexion from MQTT                    #")
+        logging.info("#               Disconnection from MQTT                    #")
         logging.info("-----------------------------------------------------------")
 
         try:
@@ -1110,7 +1091,7 @@ def run(myParams):
             logging.info("%s threshold(s) of PCE written successfully !",writeCount)
 
         # Disconnect
-        logging.info("Disconnexion of influxdb...")
+        logging.info("Disconnection of influxdb...")
         myInflux.close()
         logging.info("Influxdb disconnected.")
 
@@ -1121,7 +1102,7 @@ def run(myParams):
     # STEP 7 : Disconnect from database
     ####################################################################################################################
     logging.info("-----------------------------------------------------------")
-    logging.info("#          Disconnexion from SQLite database              #")
+    logging.info("#          Disconnection from SQLite database              #")
     logging.info("-----------------------------------------------------------")
 
     if myDb.isConnected() :
