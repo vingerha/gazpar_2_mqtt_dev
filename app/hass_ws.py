@@ -17,7 +17,7 @@ class HomeAssistantWs:
         self.unit = unit
         self.data = data
         self.action = action
-        self.domain = "gazpar_2_mqtt"
+        self.domain = "gazpar"
         self.id = 1
         self.current_stats = []
         if self.load_config():
