@@ -374,7 +374,10 @@ def run(myParams):
             
             # Loop on PCEs
             for myPce in myGrdf.pceList:
-
+                # adding check/repair if no alias is defined (with grdf)
+                if myPce.alias is None:
+                    myPce.alias = "no_alias"
+                    
                 logging.info("Publishing values of PCE %s alias %s...",myPce.pceId,myPce.alias)
                 logging.info("---------------------------------")
 
@@ -515,7 +518,7 @@ def run(myParams):
 
             # Loop on PCEs
             for myPce in myGrdf.pceList:
-
+    `           
                 logging.info("Publishing values of PCE %s alias %s...",myPce.pceId,myPce.alias)
                 logging.info("---------------------------------")
 
